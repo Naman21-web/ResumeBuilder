@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const getInitialToken = () => {
+    try {
+        const savedToken = localStorage.getItem('token');
+        return savedToken || null;
+    } catch (e) {
+        return null;
+    }
+};
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        token: null,
+        token: getInitialToken(),
         user: null,
         loading: true
     },
