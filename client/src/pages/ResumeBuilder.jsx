@@ -30,7 +30,7 @@ const ResumeBuilder = () => {
         project:[],
         skills:[],
         template:'classic',
-        accent_colour:'#3B82F6',
+        accent_color:'#3B82F6',
         public:false
     });
 
@@ -43,7 +43,7 @@ const ResumeBuilder = () => {
                     Authorization:token
                 }
             });
-            if(data.resume){
+            if(data.resume){ 
                 setResumeData(normalizeResumeData(data.resume));
                 document.title = `Editing - ${data.resume.title}`;
             }
@@ -118,8 +118,6 @@ const ResumeBuilder = () => {
                 delete updatedResumeData.personal_info.image;
             }
 
-            console.log(resumeId);
-
             const formData = new FormData();
             formData.append('resumeId',resumeId);
 
@@ -162,7 +160,7 @@ const ResumeBuilder = () => {
                             <div className="flex justify-between items-center mb-6 border-b border-gray-300 py-1">
                                <div className='flex items-center gap-2'>
                                    <TemplateSelector selectedTemplate={resumeData.template} onChange={(template) => setResumeData(prev => ({...prev,template}))}/> 
-                                    <ColorPicker selectedColor={resumeData.accent_colour} onChange={(accent_colour) => setResumeData(prev => ({...prev,accent_colour}))}/>
+                                    <ColorPicker selectedColor={resumeData.accent_color} onChange={(accent_color) => setResumeData(prev => ({...prev,accent_color}))}/>
                                 </div> 
                                <div className='flex items-center'>
                                     {activeSectionIndex !== 0 && (
@@ -179,7 +177,7 @@ const ResumeBuilder = () => {
                             {/* Form Content */}
                             <div className='space-y-6'>
                                     {activeSection.id === "personal" && (
-                                        <PersonalInfoForm data={resumeData.personal_info} onChange={(data)=>setResumeData({...resumeData,personal_info:data})} removebackground={removeBackground} setRemoveBackground={setRemoveBackground}/>
+                                        <PersonalInfoForm data={resumeData.personal_info} onChange={(data)=>{console.log("PersonalInfoForm data in main:", data); setResumeData({...resumeData,personal_info:data})}} removebackground={removeBackground} setRemoveBackground={setRemoveBackground}/>
                                     )}
                                     {activeSection.id === "summary" && (
                                         <ProfessionalSummaryForm data={resumeData.professional_summary} onChange={(data) => setResumeData(prev => ({...prev,professional_summary:data}))} setResumeData={setResumeData}/>
@@ -228,7 +226,7 @@ const ResumeBuilder = () => {
                             </div>
                         </div>
                         {/* Resume Preview */}
-                        <ResumePreview data={resumeData} template={resumeData.template} accentColor={resumeData.accent_colour} />
+                        <ResumePreview data={resumeData} template={resumeData.template} accentColor={resumeData.accent_color} />
                     </div>
                 </div>
             </div>

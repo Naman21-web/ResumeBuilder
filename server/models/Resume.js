@@ -57,6 +57,10 @@ const ResumeSchema = new mongoose.Schema({
             type:String,
             default:''
         },
+        profession:{
+            type:String,
+            default:''
+        },
     },
     experience:[{
         company:{

@@ -5,7 +5,7 @@ export default function normalizeResumeData(data = {}) {
     title: data.title || '',
     template: typeof data.template === 'string' ? data.template : 'classic',
     public: !!data.public,
-    accent_colour: data.accent_colour || '#3B82F6',
+    accent_color: data.accent_color || '#3B82F6',
     personal_info: {
       image: (data.personal_info && typeof data.personal_info.image === 'string') ? data.personal_info.image : (data.personal_info?.image?.url || '') || '',
       full_name: data.personal_info?.full_name || '',
@@ -14,6 +14,7 @@ export default function normalizeResumeData(data = {}) {
       location: data.personal_info?.location || '',
       linkedin: data.personal_info?.linkedin || '',
       website: data.personal_info?.website || '',
+      profession: data.personal_info?.profession || '',
     },
     professional_summary: (typeof data.professional_summary === 'string') ? data.professional_summary : (data.professional_summary?.content ?? ''),
     experience: Array.isArray(data.experience) ? data.experience.map(e => ({

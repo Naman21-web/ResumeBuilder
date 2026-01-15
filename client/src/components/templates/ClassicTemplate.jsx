@@ -2,8 +2,10 @@ import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
 
 const ClassicTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
+        console.log("Formatting date:", dateStr);
         if (!dateStr) return "";
         const [year, month] = dateStr.split("-");
+        if(!year || !month) return dateStr; // return as is if format is unexpected
         return new Date(year, month - 1).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short"
