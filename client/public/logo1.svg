@@ -1,0 +1,26 @@
+<svg width="150" height="40" viewBox="0 0 150 40" xmlns="http://www.w3.org/2000/svg">
+  {/* <!-- resume text --> */}
+  <text
+    x="0"
+    y="28"
+    font-family="Inter, Arial, sans-serif"
+    font-size="22"
+    font-weight="600"
+    fill="#020618">
+    resume
+  </text>
+
+  {/* <!-- green circle (slightly more gap from 'e' and a bit down) --> */}
+  <circle cx="82" cy="25" r="4" fill="#00A63E"/>
+
+  {/* <!-- ai text (closer to circle) --> */}
+  <text
+    x="89"
+    y="28"
+    font-family="Inter, Arial, sans-serif"
+    font-size="18"
+    font-weight="600"
+    fill="#020618">
+    ai
+  </text>
+</svg>
