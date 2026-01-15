@@ -242,7 +242,11 @@ const SimpleResume = ({ data, accentColor }) => {
                   <h3 className="font-semibold text-gray-900">{exp.position}</h3>
                   <p className="text-gray-700">{exp.company}</p>
                   {exp.description && (
-                    <p className="text-gray-700 mt-1 whitespace-pre-line" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>{exp.description}</p>
+                    <ul className="list-disc list-inside text-gray-700 mt-1 space-y-1" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>
+                      {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                        <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                      ))}
+                    </ul>
                   )}
                 </div>
                 <div className="text-sm text-gray-600 text-right">
@@ -288,7 +292,13 @@ const SimpleResume = ({ data, accentColor }) => {
             {data.project.map((proj, index) => (
               <div key={index} className="proj-item" style={{ marginBottom: itemSpacing + 'px' }}>
                 <h4 className="font-semibold text-gray-800">{proj.name}</h4>
-                <p className="text-gray-600" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>{proj.description}</p>
+                {proj.description && (
+                  <ul className="list-disc list-inside text-gray-600 space-y-1" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>
+                    {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                      <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>

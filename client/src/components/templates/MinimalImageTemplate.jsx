@@ -143,8 +143,8 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                         </p>
                                         {exp.description && (
                                             <ul className="list-disc list-inside text-sm text-zinc-700 leading-relaxed space-y-1">
-                                                {exp.description.split("\n").map((line, i) => (
-                                                    <li key={i}>{line}</li>
+                                                {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                                                    <li key={idx}>{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                                                 ))}
                                             </ul>
                                         )}
@@ -169,8 +169,8 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                         </p>
                                         {project.description && (
                                             <ul className="list-disc list-inside text-sm text-zinc-700  space-y-1">
-                                                {project.description.split("\n").map((line, i) => (
-                                                    <li key={i}>{line}</li>
+                                                {project.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                                                    <li key={idx}>{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                                                 ))}
                                             </ul>
                                         )}

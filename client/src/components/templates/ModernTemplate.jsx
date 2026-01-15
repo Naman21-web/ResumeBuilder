@@ -84,8 +84,12 @@ const ModernTemplate = ({ data, accentColor }) => {
 										</div>
 									</div>
 									{exp.description && (
-										<div className="text-gray-700 leading-relaxed mt-3 whitespace-pre-line">
-											{exp.description}
+										<div className="text-gray-700 leading-relaxed mt-3">
+											<ul className="list-disc list-inside space-y-1">
+												{exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+													<li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+												))}
+											</ul>
 										</div>
 									)}
 								</div>
@@ -113,7 +117,11 @@ const ModernTemplate = ({ data, accentColor }) => {
 									</div>
 									{p.description && (
 										<div className="text-gray-700 leading-relaxed text-sm mt-3">
-											{p.description}
+											<ul className="list-disc list-inside space-y-1">
+												{p.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+													<li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+												))}
+											</ul>
 										</div>
 									)}
 								</div>

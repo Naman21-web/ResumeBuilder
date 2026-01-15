@@ -91,8 +91,12 @@ const ClassicTemplate = ({ data, accentColor }) => {
                                     </div>
                                 </div>
                                 {exp.description && (
-                                    <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                        {exp.description}
+                                    <div className="text-gray-700 leading-relaxed">
+                                        <ul className="list-disc list-inside space-y-1">
+                                            {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                                                <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 )}
                             </div>
@@ -113,7 +117,13 @@ const ClassicTemplate = ({ data, accentColor }) => {
                             <div key={index} className="flex justify-between items-start border-l-3 border-gray-300 pl-6">
                                 <div>
                                     <li className="font-semibold text-gray-800 ">{proj.name}</li>
-                                    <p className="text-gray-600">{proj.description}</p>
+                                    {proj.description && (
+                                        <ul className="list-disc list-inside space-y-1 text-gray-600">
+                                            {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                                                <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                         ))}

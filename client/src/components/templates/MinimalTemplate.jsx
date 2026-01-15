@@ -57,8 +57,12 @@ const MinimalTemplate = ({ data, accentColor }) => {
                                 </div>
                                 <p className="text-gray-600 mb-2">{exp.company}</p>
                                 {exp.description && (
-                                    <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                        {exp.description}
+                                    <div className="text-gray-700 leading-relaxed">
+                                        <ul className="list-disc list-inside space-y-1">
+                                            {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                                                <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 )}
                             </div>
@@ -78,7 +82,13 @@ const MinimalTemplate = ({ data, accentColor }) => {
                         {data.project.map((proj, index) => (
                             <div key={index} className="flex flex-col gap-2 justify-between items-baseline">
                                 <h3 className="text-lg font-medium ">{proj.name}</h3>
-                                <p className="text-gray-600">{proj.description}</p>
+                                {proj.description && (
+                                    <ul className="list-disc list-inside space-y-1">
+                                        {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                                            <li key={idx} className="text-sm text-gray-600">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                         ))}
                     </div>
