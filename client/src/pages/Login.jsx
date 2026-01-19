@@ -40,10 +40,16 @@ export default function Login() {
         // console.log(formdata);
         try{
           const {data} = await api.post(`/api/users/${state}`,formdata);
-          dispatch(login(data));
-          localStorage.setItem('token',data.token);
-          toast.success(data.message);
-          navigate('/app')
+          
+          // If signup, redirect to email verification
+          if(state === 'signup'){
+            toast.success('Verification code sent to your email');
+            navigate('/verify-email', { state: { email: formdata.email } });
+          } else {
+            // If login, redirect to email verification
+            toast.success('Verification code sent to your email');
+            navigate('/verify-email', { state: { email: formdata.email } });
+          }
         }
         catch(err){
           toast(err?.response?.data?.message || err.message);

@@ -1,12 +1,8 @@
 import User from "../models/User.js";
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import Resume from "../models/Resume.js";
-
-const generateToken = async (userId) => {
-    const token = jwt.sign({userId},process.env.JWT_SECRET,{expiresIn: '7d'});
-    return token;
-}
+import { generateJWTToken,generateVerificationToken } from "../utils/generateToken.js";
+import { sendMail } from "../configs/nodeMailer.js";
 
 //controller for user registration
 //POST: //api/users/register
@@ -40,8 +36,14 @@ export const registerUser = async(req,res) => {
             name, email, password: hashedPassword
         });
 
-        //generate authentication token
-        const token = await generateToken(newUser._id);
+        const verificationToken = generateVerificationToken();
+        newUser.verificationToken = verificationToken;
+        sendMail(
+            newUser.email,
+            "Verify your email",
+            `Your verification code is ${verificationToken}`
+        );
+        await newUser.save();
 
         // remove password before sending response
         const userObj = newUser.toObject();
@@ -51,7 +53,6 @@ export const registerUser = async(req,res) => {
         return res.status(201).json({
             message:"User registered successfully",
             user: userObj,
-            token
         });
 
     }
@@ -88,8 +89,14 @@ export const loginUser = async(req,res) => {
             });
         }
 
-        //generate authentication token
-        const token = await generateToken(user._id);
+        const verificationToken = generateVerificationToken();
+        user.verificationToken = verificationToken;
+        sendMail(
+            user.email,
+            "Verify your email",
+            `Your verification code is ${verificationToken}`
+        );        
+        await user.save();
 
         // remove password before sending response
         const userObj = user.toObject();
@@ -98,8 +105,81 @@ export const loginUser = async(req,res) => {
         //return success message
         return res.status(201).json({
             message:"User logged in successfully",
+            user: userObj,            
+        });
+    }
+    catch(err){
+        console.log(err);
+        return res.status(500).json({
+            message:"Internal Server Error"
+        });
+    }
+}
+
+//controller for verifying user email
+//POST: /api/users/verify-email
+export const verifyEmail = async (req,res) => {
+    try{
+        const {email,verificationToken} = req.body;
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({
+                message:"Invalid email"
+            });
+        }
+
+        if(user.verificationToken !== verificationToken){
+            return res.status(400).json({
+                message:"Invalid verification token"
+            });
+        }
+
+        user.verificationToken = null;
+        await user.save();
+
+        // remove password before sending response
+        const userObj = user.toObject();
+        delete userObj.password;
+
+        //generate authentication token
+        const token = await generateJWTToken(user._id);
+
+        //return success message
+        return res.status(201).json({
+            message:"Email verified successfully",
             user: userObj,
             token
+        });
+    }
+    catch(err){
+        console.log(err);
+        return res.status(500).json({
+            message:"Internal Server Error"
+        });
+    }
+}
+
+//controller for resending verification token
+//POST: /api/users/resend-verification
+export const resendVerification = async (req,res) => {
+    try{
+        const {email} = req.body;
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({
+                message:"Invalid email"
+            });
+        }
+        const verificationToken = generateVerificationToken();
+        user.verificationToken = verificationToken;
+        sendMail(
+            user.email,
+            "Verify your email",
+            `Your verification code is ${verificationToken}`
+        );        
+        await user.save();
+        return res.status(200).json({
+            message:"Verification code resent successfully"
         });
     }
     catch(err){

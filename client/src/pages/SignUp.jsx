@@ -59,10 +59,8 @@ export default function SignUp() {
           // console.log(formdata);
         try{
           const {data} = await api.post(`/api/users/${state}`,formdata);
-          dispatch(login(data));
-          localStorage.setItem('token',data.token);
-          toast.success(data.message);
-          navigate('/app')
+          toast.success('Verification code sent to your email');
+          navigate('/verify-email', { state: { email: formdata.email } });
         }
         catch(err){
           console.log(err);

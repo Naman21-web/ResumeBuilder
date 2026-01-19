@@ -15,6 +15,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required:true
     },
+    verificationToken:{
+        type: String,
+    },
 }, {timestamps: true})
 
 UserSchema.methods.comparePassword = function(password){
