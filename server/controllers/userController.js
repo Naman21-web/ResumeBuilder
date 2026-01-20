@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from 'bcrypt';
 import Resume from "../models/Resume.js";
-import { generateJWTToken,generateVerificationToken } from "../utils/generateToken.js";
+import { generateJWTToken,generateVerificationToken,generateResetPasswordToken } from "../utils/generateToken.js";
 import { sendMail } from "../configs/nodeMailer.js";
 
 //controller for user registration
@@ -41,7 +41,8 @@ export const registerUser = async(req,res) => {
         sendMail(
             newUser.email,
             "Verify your email",
-            `Your verification code is ${verificationToken}`
+            `Your verification code is ${verificationToken}`,
+            false
         );
         await newUser.save();
 
@@ -94,7 +95,8 @@ export const loginUser = async(req,res) => {
         sendMail(
             user.email,
             "Verify your email",
-            `Your verification code is ${verificationToken}`
+            `Your verification code is ${verificationToken}`,
+            false
         );        
         await user.save();
 
@@ -175,7 +177,8 @@ export const resendVerification = async (req,res) => {
         sendMail(
             user.email,
             "Verify your email",
-            `Your verification code is ${verificationToken}`
+            `Your verification code is ${verificationToken}`,
+            false
         );        
         await user.save();
         return res.status(200).json({
@@ -229,6 +232,100 @@ export const getUserResumes = async (req,res) => {
         //return user resumes
         const resumes = await Resume.find({userId});
         return res.status(200).json({resumes});
+    }
+    catch(err){
+        console.log(err);
+        return res.status(500).json({
+            message:"Internal Server Error"
+        });
+    }
+}
+
+//controller for forgot password
+//POST: /api/users/forgot-password
+export const forgotPassword = async (req,res) => {
+    try{
+        const {email} = req.body;
+        
+        if(!email){
+            return res.status(400).json({
+                message:"Email is required"
+            });
+        }
+        
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({
+                message:"User not found with this email"
+            });
+        }
+        
+        const resetToken = generateResetPasswordToken();
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpire = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour expiry
+        await user.save();
+        
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+        
+        const message = `
+            <h2>Password Reset Request</h2>
+            <p>You requested a password reset. Click the link below to reset your password:</p>
+            <a href="${resetUrl}">Reset Password</a>
+            <p>This link will expire in 1 hour.</p>
+            <p>If you did not request this, please ignore this email.</p>
+        `;
+        
+        sendMail(
+            user.email,
+            "Password Reset Link",
+            message,
+            true
+        );
+        
+        return res.status(200).json({
+            message:"Password reset link sent to your email"
+        });
+    }
+    catch(err){
+        console.log(err);
+        return res.status(500).json({
+            message:"Internal Server Error"
+        });
+    }
+}
+
+//controller for resetting password 
+//POST: /api/users/reset-password
+export const resetPassword = async (req,res) => {
+    try{
+        const {token,password,confirmPassword} = req.body;
+        
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+        
+        if(!user){
+            return res.status(400).json({
+                message:"Invalid or expired reset token"
+            });
+        }
+        
+        if(password !== confirmPassword){
+            return res.status(400).json({
+                message:"Passwords do not match"
+            });
+        }    
+        
+        const hashedPassword = await bcrypt.hash(password,10);  
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+        
+        return res.status(200).json({
+            message:"Password reset successfully"
+        });
     }
     catch(err){
         console.log(err);

@@ -8,6 +8,8 @@ import ResumeBuilder from './pages/ResumeBuilder'
 import Dashboard from './pages/Dashboard'
 import SignUp from './pages/SignUp.jsx'
 import EmailVerification from './pages/EmailVerification.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import { useDispatch } from 'react-redux'
 import api from './configs/api.js';
 import { login, setLoading } from './app/features/authSlice.js';
@@ -60,6 +62,8 @@ const App = () => {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="verify-email" element={<EmailVerification />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
           
       </Routes>
     </>

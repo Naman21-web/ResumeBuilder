@@ -10,6 +10,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const logoutUser = () => {
         console.log("User logged out");
+        localStorage.removeItem('token');
         dispatch(logout);
         navigate('/login');
     }

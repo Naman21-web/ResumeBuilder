@@ -144,9 +144,9 @@ export default function Login() {
                   Password
                 </label>
                 <div className="text-sm">
-                  <a href="#" className="font-semibold text-green-600 hover:text-green-500">
+                  <Link to="/forgot-password" className="font-semibold text-green-600 hover:text-green-500">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="mt-2">

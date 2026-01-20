@@ -18,6 +18,12 @@ const UserSchema = new mongoose.Schema({
     verificationToken:{
         type: String,
     },
+    resetPasswordToken:{
+        type: String,
+    },
+    resetPasswordExpire:{
+        type: Date,
+    },
 }, {timestamps: true})
 
 UserSchema.methods.comparePassword = function(password){

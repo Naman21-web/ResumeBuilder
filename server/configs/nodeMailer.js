@@ -14,13 +14,18 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendMail = async (to, subject, text) => {
+export const sendMail = async (to, subject, content, isHtml = false) => {
     const mailOptions = {
         from: "Resume Builder <" + process.env.EMAIL_USER + ">",
         to,
         subject,
-        text
     };
+
+    if (isHtml) {
+        mailOptions.html = content;
+    } else {
+        mailOptions.text = content;
+    }
 
     try {
         await transporter.sendMail(mailOptions);
