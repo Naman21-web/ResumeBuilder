@@ -19,27 +19,27 @@ const tempicon = (props) => (
 
 const features = [
   {
-    name: 'Push to deploy',
+    name: 'AI-Powered Suggestions',
     description:
-      'Morbi viverra dui mi arcu sed. Tellus semper adipiscing suspendisse semper morbi. Odio urna massa nunc massa.',
+      'Get intelligent recommendations for improving your resume content, formatting, and keyword optimization to help you stand out to recruiters.',
     icon: tempicon,
   },
   {
-    name: 'SSL certificates',
+    name: 'Multiple Templates',
     description:
-      'Sit quis amet rutrum tellus ullamcorper ultricies libero dolor eget. Sem sodales gravida quam turpis enim lacus amet.',
+      'Choose from professionally designed resume templates that are ATS-optimized and work across all major job application systems.',
     icon: tempicon,
   },
   {
-    name: 'Simple queues',
+    name: 'Real-Time Preview',
     description:
-      'Quisque est vel vulputate cursus. Risus proin diam nunc commodo. Lobortis auctor congue commodo diam neque.',
+      'See exactly how your resume will look as you build it. Make instant adjustments and download in PDF or Word format anytime.',
     icon: tempicon,
   },
   {
-    name: 'Advanced security',
+    name: 'Customizable Sections',
     description:
-      'Arcu egestas dolor vel iaculis in ipsum mauris. Tincidunt mattis aliquet hac quis. Id hac maecenas ac donec pharetra eget.',
+      'Add or remove sections like projects, certifications, and achievements. Organize your experience in the way that best showcases your skills.',
     icon: tempicon,
   },
 ]

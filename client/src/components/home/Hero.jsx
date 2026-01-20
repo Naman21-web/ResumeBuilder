@@ -10,12 +10,13 @@ const Hero = () => {
 
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  const logos = [];
-  logos.push("/brands/google-logo.png");
-  logos.push("/brands/amazon-logo.png");
-  logos.push("/brands/amazon-logo.png");
-  logos.push("/brands/amazon-logo.png");
-  logos.push("/brands/amazon-logo.png");
+  const logos = [
+    { name: "Google", img: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" },
+    { name: "Amazon", img: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
+    { name: "Microsoft", img: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" },
+    { name: "Apple", img: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" },
+    { name: "Facebook", img: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" },
+  ];
 
   return (
     <section className="relative overflow-hidden bg-white">
@@ -133,8 +134,17 @@ const Hero = () => {
           </button>
         </div>
         <p className="py-6 text-slate-600 mt-14">Trusted by leading brands, including</p>
-        <div className="flex flex-wrap justify-between max-sm:justify-center gap-6 max-w-3xl w-full mx-auto py-4" id="logo-container">
-            {logos.map((logo, index) => <img key={index} src={logo} alt="brand-logo" className="h-8 object-contain opacity-60 hover:opacity-100 transition-opacity"/>)}
+        <div className="flex flex-wrap justify-center gap-12 max-w-6xl w-full mx-auto py-10" id="logo-container">
+            {logos.map((logo, index) => (
+              <div key={index} className="flex items-center justify-center p-3 rounded-lg hover:bg-green-100 transition-all">
+                <img 
+                  src={logo.img} 
+                  alt={logo.name} 
+                  title={logo.name}
+                  className="h-12 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity filter grayscale hover:grayscale-0 hover:brightness-110"
+                />
+              </div>
+            ))}
         </div>
       </div>
     </section>

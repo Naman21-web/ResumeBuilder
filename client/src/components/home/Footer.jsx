@@ -54,7 +54,7 @@ const Footer = () => {
           {/* right: tagline + social */}
           <div className="w-full lg:w-64 text-left lg:text-right">
             <p className="text-sm text-gray-600 mb-4">
-              Making every customer feel valued—no matter the size of your audience.
+              Empowering job seekers worldwide to create stunning resumes and land their dream careers.
             </p>
 
             <div className="flex items-center justify-start lg:justify-end gap-3 mb-4">

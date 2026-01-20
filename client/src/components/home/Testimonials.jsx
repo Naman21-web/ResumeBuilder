@@ -7,29 +7,29 @@ const Testimonials = () => {
     {
       logo: "https://tailwindcss.com/plus-assets/img/logos/workcation-logo-indigo-600.svg",
       quote:
-        "“Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo expedita voluptas culpa sapiente alias molestiae. Numquam corrupti in laborum sed rerum et corporis.”",
+        "\"This resume builder helped me land my dream job at a top tech company. The AI suggestions were spot-on, and the professional templates made all the difference. Highly recommended!\"",
       avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-      name: "Judith Black",
-      title: "CEO of Workcation",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: "Rajesh Patel",
+      title: "Software Engineer at Google",
     },
     {
       logo: "https://tailwindcss.com/plus-assets/img/logos/workcation-logo-indigo-600.svg",
       quote:
-        "“Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo expedita voluptas culpa sapiente alias molestiae. Numquam corrupti in laborum sed rerum et corporis.”",
+        "\"I went from unemployed to getting 5 job offers in 3 weeks after using this tool. The resume templates are modern and the builder is so intuitive. Worth every second spent!\"",
       avatar:
         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-      name: "Harish Kumar",
-      title: "Product Manager",
+      name: "Priya Sharma",
+      title: "Product Manager at Microsoft",
     },
     {
       logo: "https://tailwindcss.com/plus-assets/img/logos/workcation-logo-indigo-600.svg",
       quote:
-        "“Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo expedita voluptas culpa sapiente alias molestiae. Numquam corrupti in laborum sed rerum et corporis.”",
+        "\"As a career changer, this platform made it easy to highlight my transferable skills. The AI features really helped me craft a compelling story. Best investment I made!\"",
       avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
       name: "Aisha Khan",
-      title: "Designer",
+      title: "UX Designer at Apple",
     },
   ]
 
