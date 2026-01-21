@@ -83,7 +83,6 @@ export const getPublicResumeById = async (req,res) => {
     try{
         const {resumeId} = req.params;
         const resume = await Resume.findOne({public: true,_id:resumeId});
-
         if(!resume){
             return res.status(404).json({
                 message:"Resume not found"
