@@ -15,17 +15,49 @@ export default function EmailVerification() {
   const [error, setError] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [resendDisabled, setResendDisabled] = React.useState(false);
+  const [resendCountdown, setResendCountdown] = React.useState(0);
   const timerRef = React.useRef(null);
+  const countdownRef = React.useRef(null);
 
   // Get email from location state (passed from login/signup)
   const email = location.state?.email;
+
+  const resetCountTime = 120;
 
   React.useEffect(() => {
     if (!email) {
       navigate("/login");
     }
+    
+    // Check if there's a saved countdown in localStorage
+    const savedTime = localStorage.getItem(`resend_cooldown_${email}`);
+    if (savedTime) {
+      const remainingTime = Math.ceil((parseInt(savedTime) - Date.now()) / 1000);
+      if (remainingTime > 0) {
+        setResendDisabled(true);
+        setResendCountdown(remainingTime);
+        
+        // Start countdown
+        countdownRef.current = setInterval(() => {
+          setResendCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(countdownRef.current);
+              setResendDisabled(false);
+              localStorage.removeItem(`resend_cooldown_${email}`);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        localStorage.removeItem(`resend_cooldown_${email}`);
+      }
+    }
+    
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
     };
   }, [email, navigate]);
 
@@ -66,8 +98,28 @@ export default function EmailVerification() {
 
   const resendVerification = async () => {
     try {
-      await api.post("/api/users/resend-verification", { email });
-      toast.success("Verification code resent to your email");
+      const { data } = await api.post("/api/users/resend-verification", { email });
+      toast.success(data.message || "Verification code resent to your email");
+      
+      // Set cooldown time in localStorage (60 seconds from now)
+      const cooldownTime = Date.now() + (resetCountTime * 1000);
+      localStorage.setItem(`resend_cooldown_${email}`, cooldownTime.toString());
+      
+      // Disable button for 60 seconds
+      setResendDisabled(true);
+      setResendCountdown(resetCountTime);
+      
+      countdownRef.current = setInterval(() => {
+        setResendCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownRef.current);
+            setResendDisabled(false);
+            localStorage.removeItem(`resend_cooldown_${email}`);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (err) {
       toast.error(err?.response?.data?.message || err.message);
     }
@@ -201,9 +253,10 @@ export default function EmailVerification() {
                 <button
                   type="button"
                   onClick={resendVerification}
-                  className="font-semibold text-green-600 hover:text-green-500"
+                  disabled={resendDisabled}
+                  className="font-semibold text-green-600 hover:text-green-500 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
-                  Resend
+                  {resendDisabled ? `Resend (${resendCountdown}s)` : "Resend"}
                 </button>
               </p>
             </div>

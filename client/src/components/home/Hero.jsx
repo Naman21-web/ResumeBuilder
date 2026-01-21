@@ -44,7 +44,7 @@ const Hero = () => {
         {/* Desktop Actions */}
         <div className="hidden items-center gap-4 md:flex">
           <Link
-            to="/app?state=register"
+            to="/signup"
             className="rounded-full bg-green-600 px-5 py-2 text-sm font-semibold text-white hover:bg-green-500" hidden={user}
           >
             Get started
@@ -79,7 +79,7 @@ const Hero = () => {
             <a href="#contact" className="hover:text-green-600">Contact</a>
 
             <Link
-              to="/app?state=register"
+              to="/signup"
               className="mt-2 rounded-full bg-green-600 px-4 py-2 text-center font-semibold text-white"
             >
               Get started
