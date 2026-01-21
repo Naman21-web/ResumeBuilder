@@ -1,4 +1,4 @@
-import { Briefcase, Loader2, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { Briefcase, Loader2, Plus, Sparkles, Trash2, RotateCcw } from 'lucide-react'
 import React from 'react'
 import { useState } from 'react';
 import { useSelector } from 'react-redux'
@@ -9,6 +9,7 @@ const ExperienceForm = ({data,onChange}) => {
 
     const {token} = useSelector(state => state.auth);
     const [generatingIndex,setGeneratingIndex] =  useState(-1);
+    const [previousDescriptions, setPreviousDescriptions] = useState({});
 
     const addExperience = () => {
         const newExperience = {
@@ -39,13 +40,28 @@ const ExperienceForm = ({data,onChange}) => {
         const prompt = `enhance this job description ${experience.description} for the position of ${experience.position} at ${experience.company}.`;
         try{
             const {data} = await api.post('api/ai/enhance-job-desc', {userContent:prompt},{headers:{Authorization:token}});
+            // Store the previous description only after successful enhancement
+            setPreviousDescriptions(prev => ({...prev, [index]: experience.description}));
             updateExperience(index,'description',data.enhancedContent);
+            toast.success('Job description enhanced!');
         }
         catch(err){
-          toast(err?.response?.data?.message || err.message);            
+          toast.error(err?.response?.data?.message || err.message);            
         }
         finally{
             setGeneratingIndex(-1);
+        }
+    }
+
+    const undoDescription = (index) => {
+        if (previousDescriptions[index] !== undefined) {
+            updateExperience(index, 'description', previousDescriptions[index]);
+            setPreviousDescriptions(prev => {
+                const updated = {...prev};
+                delete updated[index];
+                return updated;
+            });
+            toast.success('Description restored!');
         }
     }
 
@@ -96,14 +112,22 @@ const ExperienceForm = ({data,onChange}) => {
                         <div className='space-y-2'>
                             <div className='flex items-center justify-between'>
                                 <label className='text-sm font-medium text-gray-700'>Job description</label>
-                                <button onClick={() => generateDescription(index)} disabled={generatingIndex===index || !experience.position || !experience.company} className='flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors disabled:opacity-50'>
-                                    {generatingIndex === index ? (
-                                        <Loader2 className='w-3 h-3 animate-spin' />
-                                    ) : (
-                                        <Sparkles className='w-3 h-3' />
+                                <div className='flex items-center gap-2'>
+                                    <button onClick={() => generateDescription(index)} disabled={generatingIndex===index || !experience.position || !experience.company} className='flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors disabled:opacity-50'>
+                                        {generatingIndex === index ? (
+                                            <Loader2 className='w-3 h-3 animate-spin' />
+                                        ) : (
+                                            <Sparkles className='w-3 h-3' />
+                                        )}
+                                        Enhance with AI
+                                    </button>
+                                    {previousDescriptions[index] !== undefined && (
+                                        <button onClick={() => undoDescription(index)} className='flex items-center gap-1 px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors'>
+                                            <RotateCcw className='w-3 h-3' />
+                                            Undo
+                                        </button>
                                     )}
-                                    Enhance with AI
-                                </button>
+                                </div>
                             </div>
                             <textarea value={experience.description || ""} onChange={(e) => updateExperience(index,"description",e.target.value)} className='w-full text-sm px-3 py-2 rounded-lg resize-none' placeholder='Describe your key responsibilities and achievements...'/>
                         </div>

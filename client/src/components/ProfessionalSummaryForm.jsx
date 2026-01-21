@@ -1,4 +1,4 @@
-import { Loader, Sparkles } from 'lucide-react';
+import { Loader, Sparkles, RotateCcw } from 'lucide-react';
 import React from 'react';
 import { useState } from 'react';
 import {useSelector} from 'react-redux';
@@ -9,6 +9,7 @@ const ProfessionalSummary = ({data,onChange,setResumeData}) => {
 
     const {token} = useSelector(state => state.auth);
     const [isGenerating,setIsGenerating] = useState(false);
+    const [previousSummary, setPreviousSummary] = useState(null);
 
     const generateSummary = async() => {
         try{
@@ -20,13 +21,24 @@ const ProfessionalSummary = ({data,onChange,setResumeData}) => {
                 { headers: { Authorization: `${token}` } }
             );
             const enhanced = response.data.enhancedContent?.content ?? response.data.enhancedContent;
+            // Store the previous summary only after successful enhancement
+            setPreviousSummary(data);
             setResumeData(prev => ({...prev, professional_summary: enhanced }));
+            toast.success('Professional summary enhanced!');
         }
         catch(err){
-          toast(err?.response?.data?.message || err.message);            
+          toast.error(err?.response?.data?.message || err.message);            
         }
         finally{
             setIsGenerating(false);
+        }
+    }
+
+    const undoEnhancement = () => {
+        if (previousSummary !== null) {
+            setResumeData(prev => ({...prev, professional_summary: previousSummary}));
+            setPreviousSummary(null);
+            toast.success('Enhancement undone!');
         }
     }
 
@@ -37,10 +49,18 @@ const ProfessionalSummary = ({data,onChange,setResumeData}) => {
                 <h3 className='flex items-center gap-2 text-lg font-semibold text-gray-900'>Professional Summary</h3>
                 <p className='text-sm text-gray-500'>Add summary for your resume here</p>
             </div>
-            <button disabled={isGenerating} onClick={generateSummary} className='flex items-center gap-2 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors disabled:opacity-50'>
-                {isGenerating ? (<Loader className='size-4 animate-spin'/>) : (<Sparkles className='size-4'/>)}
-                {isGenerating ? 'Enhancing...' : 'AI Enhance'}
-            </button>
+            <div className='flex items-center gap-2'>
+                <button disabled={isGenerating} onClick={generateSummary} className='flex items-center gap-2 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors disabled:opacity-50'>
+                    {isGenerating ? (<Loader className='size-4 animate-spin'/>) : (<Sparkles className='size-4'/>)}
+                    {isGenerating ? 'Enhancing...' : 'AI Enhance'}
+                </button>
+                {previousSummary !== null && (
+                    <button onClick={undoEnhancement} className='flex items-center gap-2 px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors'>
+                        <RotateCcw className='size-4'/>
+                        Undo
+                    </button>
+                )}
+            </div>
         </div>
 
         <div className='mt-6'>
