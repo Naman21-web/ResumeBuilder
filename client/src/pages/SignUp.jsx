@@ -5,6 +5,7 @@ import api from "../configs/api";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { login } from "../app/features/authSlice";
+import GoogleLogin from "../components/GoogleLogin";
 
 export default function SignUp() {
 
@@ -217,6 +218,21 @@ export default function SignUp() {
               </button>
             </div>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <GoogleLogin />
+            </div>
+          </div>
 
           <p className="mt-10 text-center text-sm/6 text-gray-500">
             Already a member?{' '}

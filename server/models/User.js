@@ -13,7 +13,11 @@ const UserSchema = new mongoose.Schema({
     },
     password:{
         type: String,
-        required:true
+    },
+    googleId:{
+        type: String,
+        unique: true,
+        sparse: true
     },
     verificationToken:{
         type: String,
@@ -24,6 +28,10 @@ const UserSchema = new mongoose.Schema({
     resetPasswordExpire:{
         type: Date,
     },
+    isEmailVerified:{
+        type: Boolean,
+        default: false
+    }
 }, {timestamps: true})
 
 UserSchema.methods.comparePassword = function(password){

@@ -199,6 +199,8 @@ export const getUserById = async(req,res) => {
     try{
         const userId = req.userId;
 
+        console.log("Fetching user data for ID:", userId);
+
         const user = await User.findById(userId);
         if(!user){
             return res.status(400).json({

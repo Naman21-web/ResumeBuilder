@@ -1,11 +1,13 @@
 import express from 'express';
 import { getUserById, getUserResumes, loginUser, registerUser, resendVerification, resetPassword, verifyEmail, forgotPassword } from '../controllers/userController.js';
+import { googleAuth } from '../controllers/googleAuthController.js';
 import protect from '../middlewares/authMiddleware.js';
 
 const userRouter = express.Router();
 
 userRouter.post('/signup',registerUser);
 userRouter.post('/login',loginUser);
+userRouter.post('/google', googleAuth);
 userRouter.get('/data',protect,getUserById);
 userRouter.get('/resumes',protect,getUserResumes);
 userRouter.post('/verify-email',verifyEmail);
