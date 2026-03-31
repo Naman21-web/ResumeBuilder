@@ -27,6 +27,15 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   const skills = Array.isArray(data.skills) ? data.skills : [];
   const certifications = Array.isArray(data.certifications) ? data.certifications : [];
 
+  // Normalize skills to objects with string `label` and `classification` to avoid rendering objects
+  const normalizedSkills = skills.map((s) => {
+    if (!s) return { label: "", classification: "" };
+    if (typeof s === "string") return { label: s, classification: "" };
+    const label = typeof s.label === "string" ? s.label : (typeof s.name === "string" ? s.name : String(s));
+    const classification = typeof s.classification === "string" ? s.classification.trim() : "";
+    return { label, classification };
+  });
+
   const headingColor = accentColor || "#0047b3";
 
   const sectionTitle = (title) => (
@@ -125,7 +134,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
   // Prefer AI-extracted keywords when available; otherwise fall back to previous logic
   const aiKeywords = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase().trim()).filter(Boolean) : [];
-  const skillLabels = skills.map(s => (s?.label || s).toString().toLowerCase()).filter(Boolean);
+  const skillLabels = normalizedSkills.map(s => (s.label || '').toString().toLowerCase()).filter(Boolean);
 
   // Build skill variants to improve matching: original, stripped punctuation, and component words
   const skillVariants = [];
@@ -140,12 +149,12 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
   const jobKeywords = (data?.highlight_mode === 'skills-only')
     ? uniqueSkillVariants
-    : ([...new Set([...(uniqueSkillVariants || []), ...(aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, skills.map(s => (s?.label || s))) || [])])]);
+    : ([...new Set([...(uniqueSkillVariants || []), ...(aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, normalizedSkills.map(ns => ns.label)) || [])])]);
 
   // Group skills by classification
-  const skillsByClassification = skills.reduce((acc, s) => {
+  const skillsByClassification = normalizedSkills.reduce((acc, s) => {
     let classification = s?.classification?.trim() || "";
-    
+
     // If no explicit classification, detect from skill name
     if (!classification) {
       const skillName = (s?.label || s?.name || s).toString().toLowerCase();
