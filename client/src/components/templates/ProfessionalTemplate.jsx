@@ -175,6 +175,13 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
     return acc;
   }, {});
 
+  // Ensure 'Other Skills' appears last when rendering
+  const orderedSkillsEntries = Object.entries(skillsByClassification).sort(([a], [b]) => {
+    if (a === 'Other Skills') return 1;
+    if (b === 'Other Skills') return -1;
+    return a.localeCompare(b);
+  });
+
   return (
     <div className="max-w-4xl mx-auto bg-white text-gray-900 p-5 leading-snug border border-gray-200" style={{ pageBreakAfter: 'avoid', fontSize: '13pt' }}>
       {/* Header */}
@@ -230,7 +237,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
         <section className="mb-1">
           {sectionTitle("Technical Skills")}
           <div className="space-y-0 text-sm text-gray-700">
-            {Object.entries(skillsByClassification).map(([classification, items]) => (
+            {orderedSkillsEntries.map(([classification, items]) => (
               <div key={classification} className="leading-snug">
                 <span className="font-semibold text-gray-800">{classification}:</span> <span className="text-gray-700">{items.join(', ')}</span>
               </div>
