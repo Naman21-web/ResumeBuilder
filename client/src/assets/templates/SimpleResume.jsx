@@ -304,7 +304,7 @@ const SimpleResume = ({ data, accentColor }) => {
 
           <ul className="skills list-disc pl-5 text-gray-700" style={{ fontSize: skillsFontSize + 'px', margin: 0 }}>
             {data.skills.map((skill, index) => (
-              <li key={index} style={{ display: 'inline-block', marginRight: skillInlineGap + 'px', marginBottom: '0px', overflowWrap: 'break-word', wordBreak: 'break-word' }}><span style={{ marginRight: '6px' }}>•</span>{skill}</li>
+              <li key={index} style={{ display: 'inline-block', marginRight: skillInlineGap + 'px', marginBottom: '0px', overflowWrap: 'break-word', wordBreak: 'break-word' }}><span style={{ marginRight: '6px' }}>•</span>{skill?.label || skill?.name || skill}</li>
             ))}
           </ul> 
         </section>

@@ -15,7 +15,7 @@ const SimpleResume = ({ data, accentColor }) => {
   // Header specific compacting
   const [headerFontSize, setHeaderFontSize] = useState(22); // px
   const [headerSpacing, setHeaderSpacing] = useState(8); // px (margin-bottom)
-  const [headingSpacing, setHeadingSpacing] = useState(6); // px (gap below section headings)
+  const [headingSpacing, setHeadingSpacing] = useState(10); // px (gap below section headings)
   const minPadding = 8;
   const minSectionSpacing = 6;
   const minItemSpacing = 6;
@@ -24,7 +24,7 @@ const SimpleResume = ({ data, accentColor }) => {
   const minSkillGap = 4;
   const minHeaderFont = 14;
   const minHeaderSpacing = 4;
-  const minHeadingSpacing = 4;
+  const minHeadingSpacing = 6;
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
@@ -221,7 +221,7 @@ const SimpleResume = ({ data, accentColor }) => {
       {/* Summary */}
       {data.professional_summary && (
         <section style={{ marginBottom: sectionSpacing + 'px' }}>
-          <h2 className="text-sm font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
+          <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             SUMMARY
           </h2>
           <p className="text-gray-700 whitespace-pre-line" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>{data.professional_summary}</p>
@@ -231,7 +231,7 @@ const SimpleResume = ({ data, accentColor }) => {
       {/* Experience */}
       {data.experience && data.experience.length > 0 && (
         <section style={{ marginBottom: sectionSpacing + 'px' }}>
-          <h2 className="text-sm font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
+          <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             EXPERIENCE
           </h2>
 
@@ -261,7 +261,7 @@ const SimpleResume = ({ data, accentColor }) => {
       {/* Education */}
       {data.education && data.education.length > 0 && (
         <section style={{ marginBottom: sectionSpacing + 'px' }}>
-          <h2 className="text-sm font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
+          <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             EDUCATION
           </h2>
 
@@ -284,7 +284,7 @@ const SimpleResume = ({ data, accentColor }) => {
       {/* Projects */}
       {data.project && data.project.length > 0 && (
         <section style={{ marginBottom: sectionSpacing + 'px' }}>
-          <h2 className="text-sm font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
+          <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             PROJECTS
           </h2>
 
@@ -308,13 +308,13 @@ const SimpleResume = ({ data, accentColor }) => {
       {/* Skills */}
       {data.skills && data.skills.length > 0 && (
         <section style={{ marginBottom: sectionSpacing + 'px' }}>
-          <h2 className="text-sm font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
+          <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             SKILLS
           </h2>
 
           <div className="skills flex flex-wrap text-gray-700" style={{ gap: skillGap + 'px', fontSize: skillsFontSize + 'px' }}>
             {data.skills.map((skill, index) => (
-              <div key={index} style={{ fontSize: skillsFontSize + 'px' }}>{skill}</div>
+              <div key={index} style={{ fontSize: skillsFontSize + 'px' }}>{skill?.label || skill?.name || skill}</div>
             ))}
           </div>
         </section>
@@ -323,7 +323,7 @@ const SimpleResume = ({ data, accentColor }) => {
       {/* Achievements / Training */}
       {((data.key_achievements && data.key_achievements.length > 0) || (data.training && data.training.length > 0)) && (
         <section style={{ marginBottom: sectionSpacing + 'px' }}>
-          <h2 className="text-sm font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
+          <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             ADDITIONAL
           </h2>
 

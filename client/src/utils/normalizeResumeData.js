@@ -17,6 +17,7 @@ export default function normalizeResumeData(data = {}) {
       profession: data.personal_info?.profession || '',
     },
     professional_summary: (typeof data.professional_summary === 'string') ? data.professional_summary : (data.professional_summary?.content ?? ''),
+    isummary: (typeof data.isummary === 'string') ? data.isummary : (data.isummary?.content ?? ''),
     experience: Array.isArray(data.experience) ? data.experience.map(e => ({
       company: e?.company || '',
       position: e?.position || '',
@@ -37,7 +38,19 @@ export default function normalizeResumeData(data = {}) {
       graduation_date: ed?.graduation_date || '',
       gpa: ed?.gpa || ''
     })) : [],
-    skills: Array.isArray(data.skills) ? data.skills.map(s => String(s)) : (data.skills ? [String(data.skills)] : []),
+    skills: Array.isArray(data.skills)
+      ? data.skills.map(s => {
+          if (s && typeof s === 'object') {
+            return {
+              label: s.label || s.name || '',
+              classification: s.classification || s.category || ''
+            };
+          }
+          return { label: String(s), classification: '' };
+        })
+      : data.skills
+      ? [{ label: String(data.skills), classification: '' }]
+      : [],
   };
 
   return normalized;

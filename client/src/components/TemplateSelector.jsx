@@ -28,6 +28,11 @@ const TemplateSelector = ({selectedTemplate,onChange}) => {
             id:'simple',
             name:'Simple Resume',
             preview:'Simple and classic single-column resume layout.'
+        },
+        {
+            id:'professional',
+            name:'Professional',
+            preview:'High-contrast professional layout with a bold header and clearly segmented sections.'
         }
     ]
 

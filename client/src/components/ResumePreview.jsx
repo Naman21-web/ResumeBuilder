@@ -4,6 +4,7 @@ import ModernTemplate from './templates/ModernTemplate.jsx';
 import MinimalTemplate from './templates/MinimalTemplate.jsx';
 import MinimalImageTemplate from './templates/MinimalImageTemplate.jsx';
 import SimpleResume from './templates/SimpleResume.jsx';
+import ProfessionalTemplate from './templates/ProfessionalTemplate.jsx';
 import normalizeResumeData from '../utils/normalizeResumeData';
 
 const ResumePreview = ({data,template,accentColor,classes=""}) => {
@@ -19,6 +20,8 @@ const ResumePreview = ({data,template,accentColor,classes=""}) => {
                 return <MinimalImageTemplate data={normalized} accentColor={accentColor}/>;
             case 'simple':
                 return <SimpleResume data={normalized} accentColor={accentColor}/>;
+            case 'professional':
+                return <ProfessionalTemplate data={normalized} accentColor={accentColor}/>;
             default:
                 return <ClassicTemplate data={normalized} accentColor={accentColor}/>;
         }
