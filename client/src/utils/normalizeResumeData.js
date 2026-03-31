@@ -23,7 +23,7 @@ export default function normalizeResumeData(data = {}) {
       position: e?.position || '',
       start_date: e?.start_date || '',
       end_date: e?.end_date || '',
-      description: e?.description || '',
+      description: (e?.description || '').replace(/@@PH\d+@@/g, ''),
       is_current: !!e?.is_current
     })) : [],
     project: Array.isArray(data.project) ? data.project.map(p => ({
@@ -51,6 +51,9 @@ export default function normalizeResumeData(data = {}) {
       : data.skills
       ? [{ label: String(data.skills), classification: '' }]
       : [],
+    tailor_job_description: data.tailor_job_description || ''
+    ,highlight_mode: data.highlight_mode || 'skills+job'
+    ,ai_keywords: Array.isArray(data.ai_keywords) ? data.ai_keywords : []
   };
 
   return normalized;

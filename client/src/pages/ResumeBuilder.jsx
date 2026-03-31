@@ -9,6 +9,7 @@ import ColorPicker from '../components/ColorPicker';
 import ProfessionalSummaryForm from '../components/ProfessionalSummaryForm';
 import normalizeResumeData from '../utils/normalizeResumeData';
 import ExperienceForm from '../components/ExperienceForm';
+import TailorExperiences from '../components/TailorExperiences';
 import EducationForm from '../components/EducationForm';
 import ProjectForm from '../components/ProjectForm';
 import SkillsForm from '../components/SkillsForm';
@@ -24,6 +25,9 @@ const ResumeBuilder = () => {
         _id:'',
         title:'',
         personal_info:{},
+        tailor_job_description:'',
+        highlight_mode:'skills+job',
+        ai_keywords:[],
         professional_summary:"",
         experience:[],
         education:[],
@@ -118,6 +122,15 @@ const ResumeBuilder = () => {
                 delete updatedResumeData.personal_info.image;
             }
 
+            // Sanitize any rendering placeholders (e.g. @@PH3@@) that might have been persisted accidentally
+            const stripPlaceholders = (str) => typeof str === 'string' ? str.replace(/@@PH\d+@@/g, '') : str;
+            if(Array.isArray(updatedResumeData.experience)){
+                updatedResumeData.experience = updatedResumeData.experience.map(e => ({
+                    ...e,
+                    description: Array.isArray(e.description) ? e.description.map(d => stripPlaceholders(d)) : stripPlaceholders(e.description)
+                }));
+            }
+
             const formData = new FormData();
             formData.append('resumeId',resumeId);
 
@@ -183,7 +196,10 @@ const ResumeBuilder = () => {
                                         <ProfessionalSummaryForm data={resumeData.professional_summary} onChange={(data) => setResumeData(prev => ({...prev,professional_summary:data}))} setResumeData={setResumeData}/>
                                     )}
                                     {activeSection.id === "experience" && (
-                                        <ExperienceForm data={resumeData.experience} onChange={(data) => setResumeData(prev => ({...prev,experience:data}))}/>
+                                        <>
+                                            <TailorExperiences experiences={resumeData.experience} skills={resumeData.skills} onUpdate={(experiences) => setResumeData(prev => ({...prev, experience: experiences}))} onJobDescriptionChange={(jobDesc) => setResumeData(prev => ({...prev, tailor_job_description: jobDesc}))} onHighlightModeChange={(mode) => setResumeData(prev => ({...prev, highlight_mode: mode}))} onKeywordsExtracted={(keywords) => setResumeData(prev => ({...prev, ai_keywords: keywords}))} initialMode={resumeData.highlight_mode} />
+                                            <ExperienceForm data={resumeData.experience} onChange={(data) => setResumeData(prev => ({...prev,experience:data}))}/>
+                                        </>
                                     )}
                                     {activeSection.id === "education" && (
                                         <EducationForm data={resumeData.education} onChange={(data) => setResumeData(prev => ({...prev,education:data}))}/>

@@ -37,6 +37,99 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
     </div>
   );
 
+  // Build keyword and phrase list from job description and skills for more accurate matching
+  const getKeywordsFromJob = (jobDesc, skillsList) => {
+    if(!jobDesc && (!skillsList || skillsList.length === 0)) return [];
+    const stopwords = new Set(["the","and","or","for","with","a","an","to","of","in","on","by","at","from","as","is","are","be","will","you","your","that","this","we","our","it","its"]);
+
+    // include skill labels first
+    const skillKeywords = (skillsList || []).map(s => (s?.label || s).toString().toLowerCase()).filter(Boolean);
+
+    const text = (jobDesc || '').toLowerCase().replace(/[^a-z0-9\s-]/g,' ');
+    const words = text.split(/\s+/).filter(Boolean).filter(w => w.length >= 2 && !stopwords.has(w));
+
+    // generate n-grams (2..4) to capture longer phrases
+    const ngrams = new Set();
+    const wlen = words.length;
+    for(let n=2;n<=4;n++){
+      for(let i=0;i<=wlen-n;i++){
+        const gram = words.slice(i,i+n).join(' ');
+        ngrams.add(gram);
+      }
+    }
+
+    // frequency for single words
+    const freq = {};
+    words.forEach(w => { freq[w] = (freq[w]||0) + 1 });
+    const singleSorted = Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,20);
+
+    // combine: skills (highest priority) -> ngrams -> top single words
+    const combined = [...new Set([...(skillKeywords || []), ...Array.from(ngrams).slice(0,20), ...singleSorted])];
+    return combined.filter(Boolean).slice(0,40);
+  }
+
+  const highlightText = (text, keywords) => {
+    if(!text || !keywords || keywords.length === 0) return text;
+
+    // separate phrases (multi-word) and single words, sort phrases by length desc for longest-first matching
+    const phrases = keywords.filter(k => k.trim().includes(' ')).sort((a,b)=>b.length-a.length);
+    const singles = new Set(keywords.filter(k => !k.includes(' ')).map(s=>s.toLowerCase()));
+
+    // track matched regions to avoid overlapping highlights (no placeholders used)
+    const ranges = []; // [{start, end, text}]
+
+    // find phrase matches first (longest first)
+    phrases.forEach(ph => {
+      const esc = ph.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const re = new RegExp(`\\b${esc}\\b`, 'gi');
+      let m;
+      while((m = re.exec(text)) !== null){
+        // check no overlap with existing ranges
+        if(!ranges.some(r => (m.index >= r.start && m.index < r.end) || (m.index + m[0].length > r.start && m.index + m[0].length <= r.end))){
+          ranges.push({start: m.index, end: m.index + m[0].length, text: m[0]});
+        }
+      }
+    });
+
+    // find single-word matches that don't overlap
+    let idx = 0;
+    while(idx < text.length){
+      const m = text.slice(idx).match(/\b[\w'-]+\b/);
+      if(!m) break;
+      const wordStart = idx + m.index;
+      const wordEnd = wordStart + m[0].length;
+      if(!ranges.some(r => (wordStart >= r.start && wordStart < r.end) || (wordEnd > r.start && wordEnd <= r.end))){
+        if(singles.has(m[0].toLowerCase())){
+          ranges.push({start: wordStart, end: wordEnd, text: m[0]});
+        }
+      }
+      idx = wordEnd;
+    }
+
+    // sort ranges by start position and build result
+    ranges.sort((a,b) => a.start - b.start);
+    const result = [];
+    let pos = 0;
+    ranges.forEach((r, i) => {
+      if(pos < r.start){
+        result.push(<span key={`t${i}`}>{text.slice(pos, r.start)}</span>);
+      }
+      result.push(<strong key={`b${i}`}>{r.text}</strong>);
+      pos = r.end;
+    });
+    if(pos < text.length){
+      result.push(<span key="end">{text.slice(pos)}</span>);
+    }
+    return result.length ? result : text;
+  }
+
+  // Prefer AI-extracted keywords when available; otherwise fall back to previous logic
+  const aiKeywords = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase().trim()).filter(Boolean) : [];
+  const skillLabels = skills.map(s => (s?.label || s).toString().toLowerCase()).filter(Boolean);
+  const jobKeywords = (data?.highlight_mode === 'skills-only')
+    ? skillLabels
+    : (aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, skills.map(s => (s?.label || s))));
+
   // Group skills by classification
   const skillsByClassification = skills.reduce((acc, s) => {
     let classification = s?.classification?.trim() || "";
@@ -135,7 +228,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
                       .filter((point) => point.trim())
                       .slice(0, 4)
                       .map((point, index) => (
-                        <li key={index} className="leading-snug text-sm">{point.trim()}</li>
+                        <li key={index} className="leading-snug text-sm">{jobKeywords.length ? highlightText(point.trim(), jobKeywords) : point.trim()}</li>
                       ))}
                   </ul>
                 )}
