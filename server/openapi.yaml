@@ -1,0 +1,552 @@
+openapi: 3.0.3
+info:
+  title: Resume Builder API
+  version: 1.0.0
+  description: API for Resume Builder application — users, resumes, and AI helpers.
+servers:
+  - url: http://localhost:3000
+    description: Local server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        googleId:
+          type: string
+        isEmailVerified:
+          type: boolean
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    ResumeSummary:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        public:
+          type: boolean
+    Resume:
+      type: object
+      properties:
+        _id:
+          type: string
+        userId:
+          type: string
+        title:
+          type: string
+        professional_summary:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        personal_info:
+          type: object
+          properties:
+            image:
+              type: string
+            full_name:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
+            location:
+              type: string
+            linkedin:
+              type: string
+            website:
+              type: string
+        experience:
+          type: array
+          items:
+            type: object
+            properties:
+              company:
+                type: string
+              position:
+                type: string
+              start_date:
+                type: string
+              end_date:
+                type: string
+              description:
+                type: string
+              is_current:
+                type: boolean
+        project:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              description:
+                type: string
+        education:
+          type: array
+          items:
+            type: object
+            properties:
+              institution:
+                type: string
+              degree:
+                type: string
+              field:
+                type: string
+              graduation_date:
+                type: string
+              gpa:
+                type: string
+paths:
+  /api/users/signup:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        '201':
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/users/login:
+    post:
+      summary: Login user (returns verification token flow)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Login initiated (verification sent)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/users/google:
+    post:
+      summary: Login or register using Google ID token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Google ID token (credential)
+      responses:
+        '200':
+          description: Google login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid Google token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/users/verify-email:
+    post:
+      summary: Verify email using verification token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                verificationToken:
+                  type: string
+      responses:
+        '201':
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+  /api/users/resend-verification:
+    post:
+      summary: Resend verification token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Verification resent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/users/forgot-password:
+    post:
+      summary: Send password reset link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Password reset link sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/users/reset-password:
+    post:
+      summary: Reset password using token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/users/data:
+    get:
+      summary: Get logged in user data
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: User data returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+  /api/users/resumes:
+    get:
+      summary: Get resumes list for logged in user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of resumes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resumes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ResumeSummary'
+  /api/resumes/create:
+    post:
+      summary: Create a new resume for authenticated user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+      responses:
+        '201':
+          description: Resume created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  resume:
+                    $ref: '#/components/schemas/Resume'
+  /api/resumes/delete/{resumeId}:
+    delete:
+      summary: Delete a resume by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resumeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resume deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/resumes/get/{resumeId}:
+    get:
+      summary: Get a resume by id for authenticated user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resumeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resume returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resume:
+                    $ref: '#/components/schemas/Resume'
+  /api/resumes/update:
+    put:
+      summary: Update a resume (multipart/form-data for image upload)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                resumeId:
+                  type: string
+                resumeData:
+                  type: string
+                  description: JSON stringified resume data
+                removeBackground:
+                  type: boolean
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Resume updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  resume:
+                    $ref: '#/components/schemas/Resume'
+  /api/resumes/public/{resumeId}:
+    get:
+      summary: Get public resume by id
+      parameters:
+        - name: resumeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Public resume returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resume:
+                    $ref: '#/components/schemas/Resume'
+  /api/ai/enhance-pro-sum:
+    post:
+      summary: Enhance professional summary using AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userContent:
+                  type: string
+      responses:
+        '200':
+          description: Enhanced content returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enhancedContent:
+                    type: string
+  /api/ai/enhance-job-desc:
+    post:
+      summary: Enhance job description using AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userContent:
+                  type: string
+      responses:
+        '200':
+          description: Enhanced content returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enhancedContent:
+                    type: string
+  /api/ai/upload-resume:
+    post:
+      summary: Upload resume text for AI extraction (creates a resume)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resumeText:
+                  type: string
+                title:
+                  type: string
+      responses:
+        '200':
+          description: Resume created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resumeId:
+                    type: string
+  /:
+    get:
+      summary: Root health check
+      responses:
+        '200':
+          description: Server is live
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Server is live...
+security:
+  - bearerAuth: []

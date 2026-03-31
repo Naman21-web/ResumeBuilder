@@ -1,0 +1,350 @@
+# Swagger file
+openapi : 3.0.3
+
+info:
+  title: Open Api Specification for ResumeBuilder
+  description: Details for ResumeBuilder application
+  version: '1.0'
+
+servers:
+  - url: "http://localhost:3000"
+  # variables:
+  #   port:
+  #     enum:
+  #       - "3000"
+  #     default: !!str 3000
+    
+tags:
+  - name: user
+    description:  User route
+  - name: resumes
+    description: Resume route
+  - name: ai
+    description: AI route
+
+# /api/user
+paths:
+
+  /api/users/signup:
+    post:
+      summary: Used to signup user to website
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name,email,password,confirmPassword]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Incorrect input
+        default:
+          description: Server Error
+      
+  /api/users/login:
+    post:
+      summary: Used to login User
+      tags: 
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+
+      responses:
+        200:
+          description: Success
+        400:
+          description: Incorrect Input
+        default:
+          description: Server Error
+
+  /api/users/google:
+    post:
+      summary: Used for login with google
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Incorrect Input
+        default:
+          description: Server Error
+          
+  /api/users/data:
+    get:
+      summary: used to get userData
+      tags:
+        - user
+      # parameters:
+      #   - in : header
+      #     name: Authorization
+      #     required: true
+      #     schema:
+      #       type: string
+      #     example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+        400:
+          description: Incorrect Input
+        default:
+          description: Server Error
+
+  /api/user/resumes:
+    get:
+      summary: Get all resumes of user
+      tags: 
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+        400:
+          description: Incorrect Input
+        default:
+          description: Server Error      
+
+  /api/user/verify-email:
+    post:
+      summary: Route to very user verifyEmail
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:  [email,verificationToken]
+              properties:
+                email:
+                  type: string
+                verificationToken:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        default:
+          description: Internal server error
+
+  /api/user/resend-verification:
+    post:
+      summary: To resend verification code
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        default:
+          description: Internal server error
+
+  /api/user/forgot-password:
+    post:
+      summary: Forget Password route
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        default:
+          description: Internal server error
+
+  /api/user/reset-password:
+    post:
+      summary: Reset password route
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token,password,confirmPassword]
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        500:
+          description: Internal Server Error
+
+  # /api/resumes:
+  /api/resumes/create:
+    post:
+      summary: Create new resume
+      tags:
+        - resume
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        500:
+          description: Internal Server Error
+
+  # /api/ai:
+  /api/ai/enhance-pro-sum:
+    post:
+      summary: For enhancing summary by AI
+      tags:
+        - ai
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema:
+              type: object
+              required:
+              properties:
+                userContent:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        500:
+          description: Internal Server Error
+
+  /api/ai/enhance-job-desc:
+    post:
+      summary: For enhancing job desc by AI
+      tags:
+        - ai
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema:
+              type: object
+              required:
+              properties:
+                userContent:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        500:
+          description: Internal Server Error
+
+  /api/ai/upload-resume:
+    post:
+      summary: For parsing uploaded Resume
+      tags:
+        - ai
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema:
+              type: object
+              required:
+              properties:
+                title:
+                  type: string
+                resumeText:
+                  type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Input
+        500:
+          description: Internal Server Error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
