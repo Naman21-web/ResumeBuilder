@@ -30,10 +30,10 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   const headingColor = accentColor || "#0047b3";
 
   const sectionTitle = (title) => (
-    <div className="mb-2 border-b" style={{ borderColor: headingColor }}>
-      <h2 className="text-base font-bold tracking-widest uppercase mb-2" style={{ color: headingColor }}>
+    <div className="mb-0.1 border-b" style={{ borderColor: headingColor }}>
+      <h6 className="text-base font-bold tracking-widest uppercase mb-0.5" style={{ color: headingColor }}>
         {title}
-      </h2>
+      </h6>
     </div>
   );
 
@@ -183,13 +183,13 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   });
 
   return (
-    <div className="max-w-4xl mx-auto bg-white text-gray-900 p-5 leading-snug border border-gray-200" style={{ pageBreakAfter: 'avoid', fontSize: '13pt' }}>
+    <div className="max-w-4xl mx-auto bg-white text-gray-900 pt-3 p-5 leading-snug border border-gray-200" style={{ pageBreakAfter: 'avoid', fontSize: '13pt' }}>
       {/* Header */}
-      <header className="text-center mb-1.5 pb-0.5" >
-        <h1 className="text-3xl font-extrabold tracking-widest" style={{ color: headingColor }}>
+      <header className="text-center mb-1 pb-0.5" >
+        <h3 className="text-xl font-extrabold tracking-widest" style={{ color: headingColor }}>
           {data.personal_info?.full_name || "YOUR NAME"}
-        </h1>
-        <p className="text-lg font-semibold text-gray-800 my-0.5">
+        </h3>
+        <p className="text-md font-semibold text-gray-800 my-0.5">
           {data.personal_info?.profession || data.personal_info?.job_title || "Software Engineer"}
         </p>
 
@@ -226,7 +226,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
       {/* Professional Summary */}
       {effectiveSummary && (
-        <section className="mb-1">
+        <section className="mb-0.5">
           {sectionTitle("Professional Summary")}
           <p className="text-sm text-gray-700 leading-snug">{effectiveSummary}</p>
         </section>
@@ -234,7 +234,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
       {/* Technical Skills with Classification */}
       {skills.length > 0 && (
-        <section className="mb-1">
+        <section className="mb-0.5">
           {sectionTitle("Technical Skills")}
           <div className="space-y-0 text-sm text-gray-700">
             {orderedSkillsEntries.map(([classification, items]) => (
@@ -248,7 +248,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
       {/* Professional Experience */}
       {experience.length > 0 && (
-        <section className="mb-1">
+        <section className="mb-0.5">
           {sectionTitle("Professional Experience")}
           <div className="space-y-0.5">
             {experience.map((exp, idx) => (
@@ -281,7 +281,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
       {/* Projects */}
       {projects.length > 0 && (
-        <section className="mb-1">
+        <section className="mb-0.5">
           {sectionTitle("Projects")}
           <div className="space-y-0.5 text-sm">
             {projects.slice(0, 2).map((proj, idx) => (
@@ -301,7 +301,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
       {/* Education */}
       {education.length > 0 && (
-        <section className="mb-1">
+        <section className="mb-0.5">
           {sectionTitle("Education")}
           <div className="space-y-0.5 text-sm">
             {education.map((edu, idx) => (
