@@ -28,6 +28,7 @@ const ResumeBuilder = () => {
         tailor_job_description:'',
         highlight_mode:'skills+job',
         ai_keywords:[],
+        manual_highlights:[],
         professional_summary:"",
         experience:[],
         education:[],
@@ -59,6 +60,7 @@ const ResumeBuilder = () => {
 
     const [activeSectionIndex,setActiveSectionIndex]=React.useState(0);
     const [removeBackground,setRemoveBackground]=React.useState(false);
+    const [highlightInput, setHighlightInput] = React.useState('');
 
     const sections = [
         {id:"personal",name:"Personal Info",icon: User},
@@ -67,6 +69,7 @@ const ResumeBuilder = () => {
         {id:"education",name:"Education",icon: GraduationCap},
         {id:"projects",name:"Projects",icon: FolderIcon},
         {id:"skills",name:"Skills",icon: Sparkles} ,
+        {id:"highlights",name:"Highlights",icon: Sparkles} ,
         {id:"achievements",name:"Achievements",icon: Sparkles} ,
           
     ]
@@ -209,6 +212,31 @@ const ResumeBuilder = () => {
                                     )}
                                     {activeSection.id === "skills" && (
                                         <SkillsForm data={resumeData.skills} onChange={(data) => setResumeData(prev => ({...prev,skills:data}))}/>
+                                    )}
+                                    {activeSection.id === "highlights" && (
+                                        <div>
+                                            <label className="text-sm font-medium">Highlight Phrases (will be bolded across preview)</label>
+                                            <div className="flex gap-2 mt-2">
+                                                <input value={highlightInput} onChange={(e)=>setHighlightInput(e.target.value)} placeholder="Enter phrase" className="flex-1 border rounded px-3 py-2 text-sm" />
+                                                <button onClick={()=>{
+                                                    const phrase = highlightInput.trim();
+                                                    if(!phrase) return;
+                                                    const existing = Array.isArray(resumeData.manual_highlights) ? resumeData.manual_highlights : [];
+                                                    setResumeData(prev => ({...prev, manual_highlights: [...existing, phrase]}));
+                                                    setHighlightInput('');
+                                                }} className="px-4 py-2 bg-blue-600 text-white rounded text-sm">Add</button>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {(resumeData.manual_highlights || []).map((h, idx) => (
+                                                    <div key={idx} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded">
+                                                        <span className="text-sm">{h}</span>
+                                                        <button onClick={()=>{
+                                                            setResumeData(prev => ({...prev, manual_highlights: prev.manual_highlights.filter((_,i)=>i!==idx)}));
+                                                        }} className="text-xs text-red-500">Remove</button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     )}
                                     {/* {activeSection.id === "achievements" && (
                                         <AchievementsForm data={resumeData.achievements} onChange={(data) => setResumeData(prev => ({...prev,achievements:data}))}/>

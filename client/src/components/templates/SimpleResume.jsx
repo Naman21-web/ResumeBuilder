@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Mail, Phone, MapPin, Linkedin, Globe, Github, Code } from "lucide-react";
+import highlightText from "../../utils/highlightText.jsx";
 
 const SimpleResume = ({ data, accentColor }) => {
   const containerRef = useRef(null);
@@ -256,7 +257,7 @@ const SimpleResume = ({ data, accentColor }) => {
                   {exp.description && (
                     <ul className="list-disc list-inside text-gray-700 mt-1 space-y-1" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>
                       {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                        <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                        <li key={idx} className="text-sm">{highlightText(point.trim(), [...(data?.manual_highlights||[]).map(h=>h.toLowerCase()), ...(data?.ai_keywords||[]), ...(data.skills||[]).map(s=> (s?.label||s).toString().toLowerCase())])}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                       ))}
                     </ul>
                   )}

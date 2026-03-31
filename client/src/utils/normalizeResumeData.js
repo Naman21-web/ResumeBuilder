@@ -56,6 +56,7 @@ export default function normalizeResumeData(data = {}) {
     tailor_job_description: data.tailor_job_description || ''
     ,highlight_mode: data.highlight_mode || 'skills+job'
     ,ai_keywords: Array.isArray(data.ai_keywords) ? data.ai_keywords : []
+    ,manual_highlights: Array.isArray(data.manual_highlights) ? data.manual_highlights.map(h => String(h)) : []
   };
 
   return normalized;

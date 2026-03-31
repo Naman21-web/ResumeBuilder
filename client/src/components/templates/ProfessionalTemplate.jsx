@@ -88,12 +88,14 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
     const ranges = []; // [{start, end, text}]
 
     // find phrase matches first (longest first)
+    // Use lookaround boundaries instead of \b so phrases containing punctuation (e.g., node.js) match
+    const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     phrases.forEach(ph => {
-      const esc = ph.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-      const re = new RegExp(`\\b${esc}\\b`, 'gi');
+      const esc = escapeRegex(ph);
+      // allow the phrase to include punctuation like dots; use negative lookbehind/lookahead for word boundaries
+      const re = new RegExp(`(?<!\\w)${esc}(?!\\w)`, 'gi');
       let m;
       while((m = re.exec(text)) !== null){
-        // check no overlap with existing ranges
         if(!ranges.some(r => (m.index >= r.start && m.index < r.end) || (m.index + m[0].length > r.start && m.index + m[0].length <= r.end))){
           ranges.push({start: m.index, end: m.index + m[0].length, text: m[0]});
         }
@@ -103,7 +105,8 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
     // find single-word matches that don't overlap
     let idx = 0;
     while(idx < text.length){
-      const m = text.slice(idx).match(/\b[\w'-]+\b/);
+      // include dot in token matching so things like node.js are captured
+      const m = text.slice(idx).match(/\b[\w'.-]+\b/);
       if(!m) break;
       const wordStart = idx + m.index;
       const wordEnd = wordStart + m[0].length;
@@ -136,6 +139,8 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   const aiKeywords = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase().trim()).filter(Boolean) : [];
   const skillLabels = normalizedSkills.map(s => (s.label || '').toString().toLowerCase()).filter(Boolean);
 
+  const manualHighlights = Array.isArray(data?.manual_highlights) ? data.manual_highlights.map(h => String(h).toLowerCase().trim()).filter(Boolean) : [];
+
   // Build skill variants to improve matching: original, stripped punctuation, and component words
   const skillVariants = [];
   skillLabels.forEach(lbl => {
@@ -149,7 +154,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
 
   const jobKeywords = (data?.highlight_mode === 'skills-only')
     ? uniqueSkillVariants
-    : ([...new Set([...(uniqueSkillVariants || []), ...(aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, normalizedSkills.map(ns => ns.label)) || [])])]);
+    : ([...new Set([...(manualHighlights || []), ...(uniqueSkillVariants || []), ...(aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, normalizedSkills.map(ns => ns.label)) || [])])]);
 
   // Group skills by classification
   const skillsByClassification = normalizedSkills.reduce((acc, s) => {

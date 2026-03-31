@@ -1,6 +1,8 @@
 
 import { Mail, Phone, MapPin, Linkedin, Globe, Github, Code } from "lucide-react";
 
+import highlightText from "../../utils/highlightText.jsx";
+
 const MinimalTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
         if (!dateStr) return "";
@@ -80,7 +82,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
                                     <div className="text-gray-700 leading-relaxed">
                                         <ul className="list-disc list-inside space-y-1">
                                             {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                                                <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                                <li key={idx} className="text-sm">{highlightText(point.trim(), [...(data?.manual_highlights||[]).map(h=>h.toLowerCase()), ...(data?.ai_keywords||[]), ...(data.skills||[]).map(s=> (s?.label||s).toString().toLowerCase())])}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                                             ))}
                                         </ul>
                                     </div>

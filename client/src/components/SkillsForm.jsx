@@ -5,8 +5,11 @@ const SkillsForm = ({data,onChange}) => {
     const [newSkill,setNewSkill] = useState("");
 
     const addSkill = () => {
-        if(newSkill.trim() && !data.includes(newSkill.trim())){
-            onChange([...data,newSkill.trim()]);
+        const candidate = newSkill.trim();
+        if(!candidate) return;
+        const exists = data.some(d => (typeof d === 'string' ? d.toLowerCase() : (d.label || '').toString().toLowerCase()) === candidate.toLowerCase());
+        if(!exists){
+            onChange([...data,candidate]);
             setNewSkill("");
         }
     }
@@ -38,14 +41,17 @@ const SkillsForm = ({data,onChange}) => {
 
         {data.length > 0 ? (
             <div className='flex flex-wrap gap-2'>
-                {data.map((skill,index) => (
-                    <span key={index} className='flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
-                        {skill}
-                        <button onClick={() => removeSkill(index)} className='ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors'>
-                            <X className='w-3 h-3'/>
-                        </button>
-                    </span>
-                ))}
+                {data.map((skill,index) => {
+                    const label = typeof skill === 'string' ? skill : (skill.label || skill.name || JSON.stringify(skill));
+                    return (
+                        <span key={index} className='flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
+                            {label}
+                            <button onClick={() => removeSkill(index)} className='ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors'>
+                                <X className='w-3 h-3'/>
+                            </button>
+                        </span>
+                    )
+                })}
             </div>
         ) : (
             <div className='text-center py-6 text-gray-500'>
