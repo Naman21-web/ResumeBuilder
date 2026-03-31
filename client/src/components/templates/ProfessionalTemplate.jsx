@@ -126,9 +126,21 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   // Prefer AI-extracted keywords when available; otherwise fall back to previous logic
   const aiKeywords = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase().trim()).filter(Boolean) : [];
   const skillLabels = skills.map(s => (s?.label || s).toString().toLowerCase()).filter(Boolean);
+
+  // Build skill variants to improve matching: original, stripped punctuation, and component words
+  const skillVariants = [];
+  skillLabels.forEach(lbl => {
+    if(!lbl) return;
+    const cleaned = lbl.replace(/[^\w\s-]/g, '');
+    skillVariants.push(lbl);
+    if(cleaned && cleaned !== lbl) skillVariants.push(cleaned);
+    cleaned.split(/\s+/).forEach(part => { if(part && part.length>1) skillVariants.push(part); });
+  });
+  const uniqueSkillVariants = [...new Set(skillVariants)].filter(Boolean);
+
   const jobKeywords = (data?.highlight_mode === 'skills-only')
-    ? skillLabels
-    : (aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, skills.map(s => (s?.label || s))));
+    ? uniqueSkillVariants
+    : ([...new Set([...(uniqueSkillVariants || []), ...(aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, skills.map(s => (s?.label || s))) || [])])]);
 
   // Group skills by classification
   const skillsByClassification = skills.reduce((acc, s) => {
