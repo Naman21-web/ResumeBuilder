@@ -14,6 +14,8 @@ export default function normalizeResumeData(data = {}) {
       location: data.personal_info?.location || '',
       linkedin: data.personal_info?.linkedin || '',
       website: data.personal_info?.website || '',
+      github: data.personal_info?.github || '',
+      leetcode: data.personal_info?.leetcode || '',
       profession: data.personal_info?.profession || '',
     },
     professional_summary: (typeof data.professional_summary === 'string') ? data.professional_summary : (data.professional_summary?.content ?? ''),

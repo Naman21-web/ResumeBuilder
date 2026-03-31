@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Globe, Github, Code } from "lucide-react";
 
 const ProfessionalTemplate = ({ data, accentColor }) => {
   const formatDate = (dateStr) => {
@@ -178,7 +178,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   return (
     <div className="max-w-4xl mx-auto bg-white text-gray-900 p-5 leading-snug border border-gray-200" style={{ pageBreakAfter: 'avoid', fontSize: '13pt' }}>
       {/* Header */}
-      <header className="text-center mb-1.5 pb-0.5" style={{ borderBottom: `2px solid ${headingColor}` }}>
+      <header className="text-center mb-1.5 pb-0.5" >
         <h1 className="text-3xl font-extrabold tracking-widest" style={{ color: headingColor }}>
           {data.personal_info?.full_name || "YOUR NAME"}
         </h1>
@@ -189,8 +189,30 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
         <div className="text-xs text-gray-600 flex flex-wrap justify-center gap-2 items-center">
           {data.personal_info?.phone && <span>{data.personal_info.phone}</span>}
           {data.personal_info?.email && <span>{data.personal_info.email}</span>}
-          {data.personal_info?.linkedin && <span>{data.personal_info.linkedin}</span>}
-          {data.personal_info?.website && <span>{data.personal_info.website}</span>}
+          {data.personal_info?.linkedin && (
+            <a href={data.personal_info.linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gray-700 hover:text-gray-900" aria-label="LinkedIn profile">
+              <Linkedin className="w-3 h-3" />
+              <span className="underline">LinkedIn</span>
+            </a>
+          )}
+          {data.personal_info?.github && (
+            <a href={data.personal_info.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gray-700 hover:text-gray-900" aria-label="GitHub profile">
+              <Github className="w-3 h-3" />
+              <span className="underline">GitHub</span>
+            </a>
+          )}
+          {data.personal_info?.leetcode && (
+            <a href={data.personal_info.leetcode} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gray-700 hover:text-gray-900" aria-label="LeetCode profile">
+              <Code className="w-3 h-3" />
+              <span className="underline">LeetCode</span>
+            </a>
+          )}
+          {data.personal_info?.website && (
+            <a href={data.personal_info.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gray-700 hover:text-gray-900" aria-label="Website">
+              <Globe className="w-3 h-3" />
+              <span className="underline">Website</span>
+            </a>
+          )}
           {data.personal_info?.location && <span>{data.personal_info.location}</span>}
         </div>
       </header>

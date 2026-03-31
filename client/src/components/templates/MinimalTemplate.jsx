@@ -1,4 +1,6 @@
 
+import { Mail, Phone, MapPin, Linkedin, Globe, Github, Code } from "lucide-react";
+
 const MinimalTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
         if (!dateStr) return "";
@@ -22,10 +24,28 @@ const MinimalTemplate = ({ data, accentColor }) => {
                     {data.personal_info?.phone && <span>{data.personal_info.phone}</span>}
                     {data.personal_info?.location && <span>{data.personal_info.location}</span>}
                     {data.personal_info?.linkedin && (
-                        <span className="break-all">{data.personal_info.linkedin}</span>
+                        <a href={data.personal_info.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all">
+                            <Linkedin />
+                            <span>LinkedIn</span>
+                        </a>
+                    )}
+                    {data.personal_info?.github && (
+                        <a href={data.personal_info.github} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all">
+                            <Github />
+                            <span>GitHub</span>
+                        </a>
+                    )}
+                    {data.personal_info?.leetcode && (
+                        <a href={data.personal_info.leetcode} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all">
+                            <Code />
+                            <span>LeetCode</span>
+                        </a>
                     )}
                     {data.personal_info?.website && (
-                        <span className="break-all">{data.personal_info.website}</span>
+                        <a href={data.personal_info.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all">
+                            <Globe />
+                            <span>Website</span>
+                        </a>
                     )}
                 </div>
             </header>

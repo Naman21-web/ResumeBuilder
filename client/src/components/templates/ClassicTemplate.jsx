@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Globe, Github, Code } from "lucide-react";
 
 const ClassicTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
@@ -47,16 +47,28 @@ const ClassicTemplate = ({ data, accentColor }) => {
                         </div>
                     )}
                     {data.personal_info?.linkedin && (
-                        <div className="flex items-center gap-1">
+                        <a href={data.personal_info.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-1">
                             <Linkedin className="size-4" />
-                            <span className="break-all">{data.personal_info.linkedin}</span>
-                        </div>
+                            <span className="break-all">LinkedIn</span>
+                        </a>
+                    )}
+                    {data.personal_info?.github && (
+                        <a href={data.personal_info.github} target="_blank" rel="noreferrer" className="flex items-center gap-1">
+                            <Github className="size-4" />
+                            <span className="break-all">GitHub</span>
+                        </a>
+                    )}
+                    {data.personal_info?.leetcode && (
+                        <a href={data.personal_info.leetcode} target="_blank" rel="noreferrer" className="flex items-center gap-1">
+                            <Code className="size-4" />
+                            <span className="break-all">LeetCode</span>
+                        </a>
                     )}
                     {data.personal_info?.website && (
-                        <div className="flex items-center gap-1">
+                        <a href={data.personal_info.website} target="_blank" rel="noreferrer" className="flex items-center gap-1">
                             <Globe className="size-4" />
-                            <span className="break-all">{data.personal_info.website}</span>
-                        </div>
+                            <span className="break-all">Website</span>
+                        </a>
                     )}
                 </div>
             </header>
