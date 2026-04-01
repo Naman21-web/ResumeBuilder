@@ -61,6 +61,8 @@ const ResumeBuilder = () => {
     const [activeSectionIndex,setActiveSectionIndex]=React.useState(0);
     const [removeBackground,setRemoveBackground]=React.useState(false);
     const [highlightInput, setHighlightInput] = React.useState('');
+    const [useCommonHighlights, setUseCommonHighlights] = React.useState(true);
+    const [sectionHighlightInputs, setSectionHighlightInputs] = React.useState({summary:'', projects:'', experience:''});
 
     const sections = [
         {id:"personal",name:"Personal Info",icon: User},
@@ -215,27 +217,77 @@ const ResumeBuilder = () => {
                                     )}
                                     {activeSection.id === "highlights" && (
                                         <div>
-                                            <label className="text-sm font-medium">Highlight Phrases (will be bolded across preview)</label>
-                                            <div className="flex gap-2 mt-2">
-                                                <input value={highlightInput} onChange={(e)=>setHighlightInput(e.target.value)} placeholder="Enter phrase" className="flex-1 border rounded px-3 py-2 text-sm" />
-                                                <button onClick={()=>{
-                                                    const phrase = highlightInput.trim();
-                                                    if(!phrase) return;
-                                                    const existing = Array.isArray(resumeData.manual_highlights) ? resumeData.manual_highlights : [];
-                                                    setResumeData(prev => ({...prev, manual_highlights: [...existing, phrase]}));
-                                                    setHighlightInput('');
-                                                }} className="px-4 py-2 bg-blue-600 text-white rounded text-sm">Add</button>
+                                            <label className="text-sm font-medium">Highlight Phrases</label>
+                                            <div className="mt-2 text-sm text-gray-600">Choose whether the same phrases apply to all sections or provide different phrases per section.</div>
+                                            <div className="flex items-center gap-3 mt-3">
+                                                <input id="useCommon" type="checkbox" checked={useCommonHighlights} onChange={(e)=>{
+                                                    const checked = e.target.checked;
+                                                    setUseCommonHighlights(checked);
+                                                    // Mirror common highlights to manual_highlights when switching to common
+                                                    if(checked){
+                                                        setResumeData(prev => ({...prev, highlight_scope: 'all', common_highlights: prev.common_highlights || [], manual_highlights: prev.common_highlights || []}));
+                                                    } else {
+                                                        setResumeData(prev => ({...prev, highlight_scope: 'per-section', section_highlights: prev.section_highlights || {summary:[], projects:[], experience:[]}}));
+                                                    }
+                                                }} />
+                                                <label htmlFor="useCommon" className="text-sm">Use same highlights for all sections</label>
                                             </div>
-                                            <div className="flex flex-wrap gap-2 mt-3">
-                                                {(resumeData.manual_highlights || []).map((h, idx) => (
-                                                    <div key={idx} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded">
-                                                        <span className="text-sm">{h}</span>
+
+                                            {useCommonHighlights ? (
+                                                <div className="mt-3">
+                                                    <div className="flex gap-2">
+                                                        <input value={highlightInput} onChange={(e)=>setHighlightInput(e.target.value)} placeholder="Enter phrase for all sections" className="flex-1 border rounded px-3 py-2 text-sm" />
                                                         <button onClick={()=>{
-                                                            setResumeData(prev => ({...prev, manual_highlights: prev.manual_highlights.filter((_,i)=>i!==idx)}));
-                                                        }} className="text-xs text-red-500">Remove</button>
+                                                            const phrase = highlightInput.trim();
+                                                            if(!phrase) return;
+                                                            const existing = Array.isArray(resumeData.common_highlights) ? resumeData.common_highlights : [];
+                                                            setResumeData(prev => ({...prev, common_highlights: [...existing, phrase], manual_highlights: [...(prev.manual_highlights||[]), phrase]}));
+                                                            setHighlightInput('');
+                                                        }} className="px-4 py-2 bg-blue-600 text-white rounded text-sm">Add</button>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                    <div className="flex flex-wrap gap-2 mt-3">
+                                                        {(resumeData.common_highlights || []).map((h, idx) => (
+                                                            <div key={idx} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded">
+                                                                <span className="text-sm">{h}</span>
+                                                                <button onClick={()=>{
+                                                                    setResumeData(prev => ({...prev, common_highlights: prev.common_highlights.filter((_,i)=>i!==idx), manual_highlights: (prev.manual_highlights||[]).filter(m=>m!==h)}));
+                                                                }} className="text-xs text-red-500">Remove</button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="mt-3 space-y-3">
+                                                    {['summary','projects','experience'].map(sectionKey => (
+                                                        <div key={sectionKey}>
+                                                            <label className="text-sm font-medium">{sectionKey.charAt(0).toUpperCase()+sectionKey.slice(1)} Highlights</label>
+                                                            <div className="flex gap-2 mt-2">
+                                                                <input value={sectionHighlightInputs[sectionKey]} onChange={(e)=>setSectionHighlightInputs(prev=>({...prev,[sectionKey]:e.target.value}))} placeholder={`Enter phrase for ${sectionKey}`} className="flex-1 border rounded px-3 py-2 text-sm" />
+                                                                <button onClick={()=>{
+                                                                    const phrase = sectionHighlightInputs[sectionKey].trim();
+                                                                    if(!phrase) return;
+                                                                    const existing = (resumeData.section_highlights && Array.isArray(resumeData.section_highlights[sectionKey])) ? resumeData.section_highlights[sectionKey] : [];
+                                                                    const newSection = {...(resumeData.section_highlights||{summary:[],projects:[],experience:[]}), [sectionKey]: [...existing, phrase]};
+                                                                    setResumeData(prev => ({...prev, section_highlights: newSection}));
+                                                                    setSectionHighlightInputs(prev=>({...prev,[sectionKey]:''}));
+                                                                }} className="px-4 py-2 bg-blue-600 text-white rounded text-sm">Add</button>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                                {((resumeData.section_highlights && resumeData.section_highlights[sectionKey]) || []).map((h, idx) => (
+                                                                    <div key={idx} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded">
+                                                                        <span className="text-sm">{h}</span>
+                                                                        <button onClick={()=>{
+                                                                            const newSection = {...(resumeData.section_highlights||{summary:[],projects:[],experience:[]})};
+                                                                            newSection[sectionKey] = newSection[sectionKey].filter((_,i)=>i!==idx);
+                                                                            setResumeData(prev => ({...prev, section_highlights: newSection}));
+                                                                        }} className="text-xs text-red-500">Remove</button>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                     {/* {activeSection.id === "achievements" && (

@@ -11,6 +11,19 @@ const ModernTemplate = ({ data, accentColor }) => {
 		});
 	};
 
+	const getSectionHighlights = (section) => {
+		const scope = data?.highlight_scope || 'all';
+		if (scope === 'per-section') return Array.isArray(data?.section_highlights?.[section]) ? data.section_highlights[section].map(s=>String(s).toLowerCase()) : [];
+		return Array.isArray(data?.common_highlights) ? data.common_highlights.map(s=>String(s).toLowerCase()) : [];
+	};
+
+	const buildKeywordsForSection = (section) => {
+		const sectionHighlights = getSectionHighlights(section);
+		const ai = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase()) : [];
+		const skillsList = Array.isArray(data.skills) ? data.skills.map(s => (s?.label || s).toString().toLowerCase()) : [];
+		return [...new Set([...(sectionHighlights||[]), ...(data?.manual_highlights||[]).map(h=>String(h).toLowerCase()), ...skillsList, ...ai])].filter(Boolean);
+	};
+
 	return (
 		<div className="max-w-4xl mx-auto bg-white text-gray-800">
 			{/* Header */}
@@ -72,7 +85,7 @@ const ModernTemplate = ({ data, accentColor }) => {
 						<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
 							Professional Summary
 						</h2>
-						<p className="text-gray-700 ">{data.professional_summary}</p>
+						<p className="text-gray-700 ">{buildKeywordsForSection('summary').length ? highlightText(data.professional_summary, buildKeywordsForSection('summary')) : data.professional_summary}</p>
 					</section>
 				)}
 
@@ -100,7 +113,7 @@ const ModernTemplate = ({ data, accentColor }) => {
 										<div className="text-gray-700 leading-relaxed mt-3">
 											<ul className="list-disc list-inside space-y-1">
 												{exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-													<li key={idx} className="text-sm">{highlightText(point.trim(), [...(data?.manual_highlights||[]).map(h=>h.toLowerCase()), ...(data?.ai_keywords||[]), ...(data.skills||[]).map(s=> (s?.label||s).toString().toLowerCase())])}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+													<li key={idx} className="text-sm">{buildKeywordsForSection('experience').length ? highlightText(point.trim(), buildKeywordsForSection('experience')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
 												))}
 											</ul>
 										</div>
@@ -132,7 +145,7 @@ const ModernTemplate = ({ data, accentColor }) => {
 										<div className="text-gray-700 leading-relaxed text-sm mt-3">
 											<ul className="list-disc list-inside space-y-1">
 												{p.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-													<li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+													<li key={idx} className="text-sm">{buildKeywordsForSection('projects').length ? highlightText(point.trim(), buildKeywordsForSection('projects')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
 												))}
 											</ul>
 										</div>

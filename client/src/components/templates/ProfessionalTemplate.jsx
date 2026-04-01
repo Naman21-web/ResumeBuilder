@@ -152,9 +152,21 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
   });
   const uniqueSkillVariants = [...new Set(skillVariants)].filter(Boolean);
 
-  const jobKeywords = (data?.highlight_mode === 'skills-only')
-    ? uniqueSkillVariants
-    : ([...new Set([...(manualHighlights || []), ...(uniqueSkillVariants || []), ...(aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, normalizedSkills.map(ns => ns.label)) || [])])]);
+  const getSectionHighlights = (section) => {
+    const scope = data?.highlight_scope || 'all';
+    if (scope === 'per-section') {
+      return Array.isArray(data?.section_highlights?.[section]) ? data.section_highlights[section].map(s => String(s).toLowerCase()) : [];
+    }
+    return Array.isArray(data?.common_highlights) ? data.common_highlights.map(s => String(s).toLowerCase()) : [];
+  };
+
+  const buildKeywordsForSection = (section) => {
+    const sectionHighlights = getSectionHighlights(section);
+    if (data?.highlight_mode === 'skills-only') return uniqueSkillVariants;
+    const jobSourceKeywords = aiKeywords.length > 0 ? aiKeywords : getKeywordsFromJob(data?.tailor_job_description, normalizedSkills.map(ns => ns.label));
+    const combined = [...new Set([...(sectionHighlights || []), ...(manualHighlights || []), ...(uniqueSkillVariants || []), ...(jobSourceKeywords || [])])];
+    return combined.filter(Boolean);
+  };
 
   // Group skills by classification
   const skillsByClassification = normalizedSkills.reduce((acc, s) => {
@@ -242,7 +254,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
       {effectiveSummary && (
         <section className="mb-0.5">
           {sectionTitle("Professional Summary")}
-          <p className="text-sm text-gray-700 leading-snug">{effectiveSummary}</p>
+          <p className="text-sm text-gray-700 leading-snug">{buildKeywordsForSection('summary').length ? highlightText(effectiveSummary, buildKeywordsForSection('summary')) : effectiveSummary}</p>
         </section>
       )}
 
@@ -276,14 +288,14 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
                     {formatDate(exp.start_date)} - {exp.is_current ? "Present" : formatDate(exp.end_date)}
                   </span>
                 </div>
-                {exp.description && (
+                    {exp.description && (
                   <ul className="list-disc list-inside ml-1 text-gray-700 space-y-0">
                     {exp.description
                       .split(/\.\s+/)
                       .filter((point) => point.trim())
                       .slice(0, 4)
                       .map((point, index) => (
-                        <li key={index} className="leading-snug text-sm">{jobKeywords.length ? highlightText(point.trim(), jobKeywords) : point.trim()}</li>
+                        <li key={index} className="leading-snug text-sm">{buildKeywordsForSection('experience').length ? highlightText(point.trim(), buildKeywordsForSection('experience')) : point.trim()}</li>
                       ))}
                   </ul>
                 )}
@@ -306,7 +318,7 @@ const ProfessionalTemplate = ({ data, accentColor }) => {
                     {proj.start_date && proj.end_date ? `${formatDate(proj.start_date)} - ${formatDate(proj.end_date)}` : ""}
                   </span>
                 </div>
-                {proj.description && <p className="text-gray-700 leading-snug text-sm">{proj.description}</p>}
+                {proj.description && <p className="text-gray-700 leading-snug text-sm">{buildKeywordsForSection('projects').length ? highlightText(proj.description, buildKeywordsForSection('projects')) : proj.description}</p>}
               </div>
             ))}
           </div>

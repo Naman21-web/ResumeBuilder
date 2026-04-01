@@ -13,6 +13,19 @@ const MinimalTemplate = ({ data, accentColor }) => {
         });
     };
 
+    const getSectionHighlights = (section) => {
+        const scope = data?.highlight_scope || 'all';
+        if (scope === 'per-section') return Array.isArray(data?.section_highlights?.[section]) ? data.section_highlights[section].map(s=>String(s).toLowerCase()) : [];
+        return Array.isArray(data?.common_highlights) ? data.common_highlights.map(s=>String(s).toLowerCase()) : [];
+    };
+
+    const buildKeywordsForSection = (section) => {
+        const sectionHighlights = getSectionHighlights(section);
+        const ai = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase()) : [];
+        const skillsList = Array.isArray(data.skills) ? data.skills.map(s => (s?.label || s).toString().toLowerCase()) : [];
+        return [...new Set([...(sectionHighlights||[]), ...(data?.manual_highlights||[]).map(h=>String(h).toLowerCase()), ...skillsList, ...ai])].filter(Boolean);
+    };
+
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white text-gray-900 font-light">
             {/* Header */}
@@ -56,7 +69,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
             {data.professional_summary && (
                 <section className="mb-10">
                     <p className=" text-gray-700">
-                        {data.professional_summary}
+                        {buildKeywordsForSection('summary').length ? highlightText(data.professional_summary, buildKeywordsForSection('summary')) : data.professional_summary}
                     </p>
                 </section>
             )}
@@ -78,11 +91,11 @@ const MinimalTemplate = ({ data, accentColor }) => {
                                     </span>
                                 </div>
                                 <p className="text-gray-600 mb-2">{exp.company}</p>
-                                {exp.description && (
+                                            {exp.description && (
                                     <div className="text-gray-700 leading-relaxed">
                                         <ul className="list-disc list-inside space-y-1">
                                             {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                                                <li key={idx} className="text-sm">{highlightText(point.trim(), [...(data?.manual_highlights||[]).map(h=>h.toLowerCase()), ...(data?.ai_keywords||[]), ...(data.skills||[]).map(s=> (s?.label||s).toString().toLowerCase())])}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                                <li key={idx} className="text-sm">{buildKeywordsForSection('experience').length ? highlightText(point.trim(), buildKeywordsForSection('experience')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                                             ))}
                                         </ul>
                                     </div>
@@ -104,10 +117,10 @@ const MinimalTemplate = ({ data, accentColor }) => {
                         {data.project.map((proj, index) => (
                             <div key={index} className="flex flex-col gap-2 justify-between items-baseline">
                                 <h3 className="text-lg font-medium ">{proj.name}</h3>
-                                {proj.description && (
+                                            {proj.description && (
                                     <ul className="list-disc list-inside space-y-1">
                                         {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                                            <li key={idx} className="text-sm text-gray-600">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                            <li key={idx} className="text-sm text-gray-600">{buildKeywordsForSection('projects').length ? highlightText(point.trim(), buildKeywordsForSection('projects')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                                         ))}
                                     </ul>
                                 )}

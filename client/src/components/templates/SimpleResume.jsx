@@ -172,6 +172,19 @@ const SimpleResume = ({ data, accentColor }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  const getSectionHighlights = (section) => {
+    const scope = data?.highlight_scope || 'all';
+    if (scope === 'per-section') return Array.isArray(data?.section_highlights?.[section]) ? data.section_highlights[section].map(s=>String(s).toLowerCase()) : [];
+    return Array.isArray(data?.common_highlights) ? data.common_highlights.map(s=>String(s).toLowerCase()) : [];
+  };
+
+  const buildKeywordsForSection = (section) => {
+    const sectionHighlights = getSectionHighlights(section);
+    const ai = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase()) : [];
+    const skillsList = Array.isArray(data.skills) ? data.skills.map(s => (s?.label || s).toString().toLowerCase()) : [];
+    return [...new Set([...(sectionHighlights||[]), ...(data?.manual_highlights||[]).map(h=>String(h).toLowerCase()), ...skillsList, ...ai])].filter(Boolean);
+  };
+
   return (
     <div ref={containerRef} className="max-w-4xl mx-auto bg-white text-gray-800 leading-relaxed" style={{ fontSize: fontSize + 'px', lineHeight: 1.25, padding: containerPadding + 'px', paddingBottom: Math.max(minPadding, containerPadding - 8) + 'px', maxWidth: '8.5in', boxSizing: 'border-box', overflowWrap: 'break-word', wordBreak: 'break-word', overflowX: 'hidden' }}>
       {/* Header */}
@@ -237,7 +250,7 @@ const SimpleResume = ({ data, accentColor }) => {
           <h2 className="text-base font-semibold" style={{ color: accentColor, marginBottom: headingSpacing + 'px' }}>
             SUMMARY
           </h2>
-          <p className="text-gray-700 whitespace-pre-line" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>{data.professional_summary}</p>
+          <p className="text-gray-700 whitespace-pre-line" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>{buildKeywordsForSection('summary').length ? highlightText(data.professional_summary, buildKeywordsForSection('summary')) : data.professional_summary}</p>
         </section>
       )}
 
@@ -257,7 +270,7 @@ const SimpleResume = ({ data, accentColor }) => {
                   {exp.description && (
                     <ul className="list-disc list-inside text-gray-700 mt-1 space-y-1" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>
                       {exp.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                        <li key={idx} className="text-sm">{highlightText(point.trim(), [...(data?.manual_highlights||[]).map(h=>h.toLowerCase()), ...(data?.ai_keywords||[]), ...(data.skills||[]).map(s=> (s?.label||s).toString().toLowerCase())])}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                        <li key={idx} className="text-sm">{buildKeywordsForSection('experience').length ? highlightText(point.trim(), buildKeywordsForSection('experience')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                       ))}
                     </ul>
                   )}
@@ -307,9 +320,9 @@ const SimpleResume = ({ data, accentColor }) => {
                 <h4 className="font-semibold text-gray-800">{proj.name}</h4>
                 {proj.description && (
                   <ul className="list-disc list-inside text-gray-600 space-y-1" style={{overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto'}}>
-                    {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                      <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
-                    ))}
+                        {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
+                          <li key={idx} className="text-sm">{buildKeywordsForSection('projects').length ? highlightText(point.trim(), buildKeywordsForSection('projects')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                        ))}
                   </ul>
                 )}
               </div>

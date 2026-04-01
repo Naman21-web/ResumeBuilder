@@ -20,6 +20,21 @@ const ClassicTemplate = ({ data, accentColor }) => {
     const education = Array.isArray(data.education) ? data.education : [];
     const skills = Array.isArray(data.skills) ? data.skills : [];
 
+    const getSectionHighlights = (section) => {
+        const scope = data?.highlight_scope || 'all';
+        if (scope === 'per-section') {
+            return Array.isArray(data?.section_highlights?.[section]) ? data.section_highlights[section].map(s => String(s).toLowerCase()) : [];
+        }
+        return Array.isArray(data?.common_highlights) ? data.common_highlights.map(s => String(s).toLowerCase()) : [];
+    };
+
+    const buildKeywordsForSection = (section) => {
+        const sectionHighlights = getSectionHighlights(section);
+        const ai = Array.isArray(data?.ai_keywords) ? data.ai_keywords.map(k => String(k).toLowerCase()) : [];
+        const skillLabels = skills.map(s => (s?.label || s?.name || s).toString().toLowerCase());
+        return [...new Set([...(sectionHighlights||[]), ...(data?.manual_highlights||[]).map(h=>String(h).toLowerCase()), ...skillLabels, ...ai])].filter(Boolean);
+    };
+
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white text-gray-800 leading-relaxed">
             {/* Header */}
@@ -80,7 +95,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
                     <h2 className="text-xl font-semibold mb-3" style={{ color: accentColor }}>
                         PROFESSIONAL SUMMARY
                     </h2>
-                    <p className="text-gray-700 leading-relaxed">{summary}</p>
+                    <p className="text-gray-700 leading-relaxed">{buildKeywordsForSection('summary').length ? highlightText(summary, buildKeywordsForSection('summary')) : summary}</p>
                 </section>
             )}
 
@@ -130,10 +145,10 @@ const ClassicTemplate = ({ data, accentColor }) => {
                             <div key={index} className="flex justify-between items-start border-l-3 border-gray-300 pl-6">
                                 <div>
                                     <li className="font-semibold text-gray-800 ">{proj.name}</li>
-                                    {proj.description && (
+                                            {proj.description && (
                                         <ul className="list-disc list-inside space-y-1 text-gray-600">
                                             {proj.description.split(/\.\s+/).filter(point => point.trim()).map((point, idx, arr) => (
-                                                <li key={idx} className="text-sm">{point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
+                                                <li key={idx} className="text-sm">{buildKeywordsForSection('experience').length ? highlightText(point.trim(), buildKeywordsForSection('experience')) : point.trim()}{idx === arr.length - 1 && !point.trim().endsWith('.') ? '.' : idx < arr.length - 1 ? '.' : ''}</li>
                                             ))}
                                         </ul>
                                     )}

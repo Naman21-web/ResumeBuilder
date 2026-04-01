@@ -57,6 +57,13 @@ export default function normalizeResumeData(data = {}) {
     ,highlight_mode: data.highlight_mode || 'skills+job'
     ,ai_keywords: Array.isArray(data.ai_keywords) ? data.ai_keywords : []
     ,manual_highlights: Array.isArray(data.manual_highlights) ? data.manual_highlights.map(h => String(h)) : []
+    ,highlight_scope: data.highlight_scope || 'all' // 'all' or 'per-section'
+    ,common_highlights: Array.isArray(data.common_highlights) ? data.common_highlights.map(h => String(h)) : []
+    ,section_highlights: (data.section_highlights && typeof data.section_highlights === 'object') ? {
+      summary: Array.isArray(data.section_highlights.summary) ? data.section_highlights.summary.map(s=>String(s)) : [],
+      projects: Array.isArray(data.section_highlights.projects) ? data.section_highlights.projects.map(s=>String(s)) : [],
+      experience: Array.isArray(data.section_highlights.experience) ? data.section_highlights.experience.map(s=>String(s)) : []
+    } : {summary:[], projects:[], experience:[]}
   };
 
   return normalized;
