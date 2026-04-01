@@ -25,9 +25,18 @@ const ResumeSchema = new mongoose.Schema({
         type:String,
         default:''
     },
-    skills: [{
-        type:String
-    }],
+    skills: [
+    {
+        label: {
+        type: String,
+        required: true
+        },
+        classification: {
+        type: String,
+        default: ""
+        }
+    }
+    ],
     personal_info: {
         image:{
             type:String,
@@ -50,6 +59,14 @@ const ResumeSchema = new mongoose.Schema({
             default:''
         },
         linkedin:{
+            type:String,
+            default:''
+        },
+        leetcode:{
+            type:String,
+            default:''
+        },
+        github:{
             type:String,
             default:''
         },
